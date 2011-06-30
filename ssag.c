@@ -3,61 +3,28 @@
 #include <string.h>
 #include <usb.h>
 
+/* Micron MT9M001 datasheet:
+ * http://download.micron.com/pdf/datasheets/imaging/mt9m001_1300_mono.pdf */
+
 /* Exposure time in milliseconds */
 #define EXPOSURE_TIME 1000
+#define GAIN 0x3b
 
 enum requests {
+    request_guide = 16, /* Issues a guide command through the guider relays */
     request_start_exposure = 18, /* Starts an exposure sequence */
     request_set_magic_init_packet = 19, /* Set an 18 byte magic init packet */
     request_magic_init_2 = 20
 };
 
-/* Opens a usb_dev_handle based on the vendor id and product id */
-static int usb_open_device(usb_dev_handle **device, int vendorID, int productId, const char *serial)
-{
-    struct usb_bus *bus;
-    struct usb_device *dev;
-    struct usb_dev_handle *handle = NULL;
+enum cardinal_directions {
+    cardinal_east = 0x10,
+    cardinal_south = 0x20,
+    cardinal_north = 0x40,
+    cardinal_west = 0x80,
+};
 
-    usb_init();
-
-    usb_find_busses();
-    usb_find_devices();
-
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
-        for (dev = bus->devices; dev; dev = dev->next) {
-            if (dev->descriptor.idVendor == vendorID &&
-                    dev->descriptor.idProduct == productId) {
-                handle = usb_open(dev);
-                if (handle) {
-                    if (serial == NULL) {
-                        goto havedevice;
-                    }
-                    else {
-                        char devserial[256];
-                        int len = 0;
-                        if (dev->descriptor.iSerialNumber > 0) {
-                            len = usb_get_string_simple(handle, dev->descriptor.iSerialNumber, devserial, sizeof(devserial));
-                        }
-                        if ((len > 0) && (strcmp(devserial, serial) == 0)) {
-                            goto havedevice;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return 0;
-havedevice:
-    usb_set_configuration(handle, 1);
-    usb_claim_interface(handle, 0);
-#ifdef LIBUSB_HAS_DETACH_KERNEL_DRIVER_NP
-    if (usb_detach_kernel_driver_np(handle, 0) < 0)
-        fprintf(stderr, "Warning: Could not detach kernel driver: %s\nYou may need to run this as root or add yourself to the usb group\n", usb_strerror());
-#endif
-    *device = handle;
-    return 1;
-}
+static int usb_open_device(usb_dev_handle **device, int vendorID, int productId, const char *serial);
 
 /* Magic init functions. Not sure what this actually does yet. */
 void send_init_sequence(usb_dev_handle *handle)
@@ -67,8 +34,10 @@ void send_init_sequence(usb_dev_handle *handle)
          * current value should be around 30% but it's not linear by the looks
          * of it so it's hard to really tell. Probably just need to graph it
          * out. */
-        0x00, 0x3b, 0x00, 0x3b,
-        0x00, 0x3b, 0x00, 0x3b,
+        /* Update: see gain settings in MT9M001 datasheet. Why didn't they just
+         * use register 0x35? Meh. */
+        0x00, GAIN, 0x00, GAIN,
+        0x00, GAIN, 0x00, GAIN,
         
         /* Controls enhanced noise reduction. Doubt this is really of any use,
          * current value turns it off */
@@ -130,6 +99,15 @@ void write_image()
     fclose(image);
 }
 
+/* Issues a guide command in direction for duration milliseconds */
+void guide(usb_dev_handle *handle, enum cardinal_directions direction, int duration)
+{
+    char data[8];
+    memcpy(data, &duration, 4);
+    memcpy(data+4, &duration, 4);
+    usb_control_msg(handle, 0x40, request_guide, 0, (int)direction, data, sizeof(data), 5000);
+}
+
 int main(int argc, const char *argv[])
 {
     usb_dev_handle *handle = NULL;
@@ -138,9 +116,57 @@ int main(int argc, const char *argv[])
         start_exposure(handle);
         read_image(handle);
         write_image();
+        guide(handle, cardinal_north, 1000);
         // In terminal:
         // convert -size 1280x1024 -depth 8 gray:image image.jpg 
     }
     usb_close(handle);
     return 0;
+}
+
+/* Opens a usb_dev_handle based on the vendor id and product id */
+static int usb_open_device(usb_dev_handle **device, int vendorID, int productId, const char *serial)
+{
+    struct usb_bus *bus;
+    struct usb_device *dev;
+    struct usb_dev_handle *handle = NULL;
+
+    usb_init();
+
+    usb_find_busses();
+    usb_find_devices();
+
+    for (bus = usb_get_busses(); bus; bus = bus->next) {
+        for (dev = bus->devices; dev; dev = dev->next) {
+            if (dev->descriptor.idVendor == vendorID &&
+                    dev->descriptor.idProduct == productId) {
+                handle = usb_open(dev);
+                if (handle) {
+                    if (serial == NULL) {
+                        goto havedevice;
+                    }
+                    else {
+                        char devserial[256];
+                        int len = 0;
+                        if (dev->descriptor.iSerialNumber > 0) {
+                            len = usb_get_string_simple(handle, dev->descriptor.iSerialNumber, devserial, sizeof(devserial));
+                        }
+                        if ((len > 0) && (strcmp(devserial, serial) == 0)) {
+                            goto havedevice;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+havedevice:
+    usb_set_configuration(handle, 1);
+    usb_claim_interface(handle, 0);
+#ifdef LIBUSB_HAS_DETACH_KERNEL_DRIVER_NP
+    if (usb_detach_kernel_driver_np(handle, 0) < 0)
+        fprintf(stderr, "Warning: Could not detach kernel driver: %s\nYou may need to run this as root or add yourself to the usb group\n", usb_strerror());
+#endif
+    *device = handle;
+    return 1;
 }
