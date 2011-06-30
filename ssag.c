@@ -7,8 +7,8 @@
 #define EXPOSURE_TIME 1000
 
 enum requests {
-    request_start_exposure = 18,
-    request_magic_init_1 = 19,
+    request_start_exposure = 18, /* Starts an exposure sequence */
+    request_set_magic_init_packet = 19, /* Set an 18 byte magic init packet */
     request_magic_init_2 = 20
 };
 
@@ -62,16 +62,23 @@ havedevice:
 /* Magic init functions. Not sure what this actually does yet. */
 void send_init_sequence(usb_dev_handle *handle)
 {
-    unsigned char magic_init_data[] = {
+    unsigned char magic_init_packet[] = {
+        /* Not so magic, 4 words repeating, controls gain. Why does it repeat? 
+         * current value should be around 30% but it's not linear by the looks
+         * of it so it's hard to really tell. Probably just need to graph it
+         * out. */
         0x00, 0x3b, 0x00, 0x3b,
         0x00, 0x3b, 0x00, 0x3b,
+        
+        /* Controls enhanced noise reduction. Doubt this is really of any use,
+         * current value turns it off */
         0x00, 0x0c, 0x00, 0x14,
         0x03, 0xff, 0x04, 0xff,
-        0x04, 0x19
+
+        0x04, 0x19 /* End ? */
     };
 
-    usb_control_msg(handle, 0x40, request_magic_init_1, 0x6ac8, 24, magic_init_data, 18, 5000);
-    usb_control_msg(handle, 0x40, request_magic_init_1, 0x6ac8, 24, magic_init_data, 18, 5000);
+    usb_control_msg(handle, 0x40, request_set_magic_init_packet, 0x6ac8, 24, magic_init_packet, 18, 5000);
     usb_control_msg(handle, 0x40, request_magic_init_2, 0x3095, 0, NULL, 0, 5000);
 }
 
@@ -97,8 +104,8 @@ void read_image(usb_dev_handle *handle)
         fwrite(data, 1, sizeof(data), fp);
     }
     usb_bulk_read(handle, 2, data, 10752, 5000);
-    fwrite(data, 1, 10752, fp);
-    usb_bulk_read(handle, 2, end, 512, 5000);
+    fwrite(data, 1, 10752, fp); /* 1,600,000 bytes by this point */
+    usb_bulk_read(handle, 2, end, 512, 5000); /* TODO: find out why this is here */
 
     fclose(fp);
 }
@@ -110,7 +117,7 @@ void write_image()
     FILE *image = fopen("image", "w");
 
     fread(buffer, 1, 1527, data);
-    fwrite(&buffer[2], 1, 1280, image);
+    fwrite(&buffer[2], 1, 1280, image); /* First 2 bytes can be discarded */
 
     int i;
     for (i = 0; i < 1023; i++) {
