@@ -11,7 +11,7 @@
 #define USB_RQ_SET_INIT_PACKET 19
 #define USB_RQ_PRE_EXPOSE 20
 
-#define BUFFER_END_POINT 2
+#define BUFFER_ENDPOINT 2
 #define BULK_READ_LENGTH 16384
 
 #define SENSOR_WIDTH 1280
@@ -76,11 +76,11 @@ unsigned char *SSAG::ReadBuffer()
     
     dptr = data;
     for (int i = 0; i < 97; i++) {
-        usb_bulk_read(this->handle, BUFFER_END_POINT, dptr, BULK_READ_LENGTH, 5000);
+        usb_bulk_read(this->handle, BUFFER_ENDPOINT, dptr, BULK_READ_LENGTH, 5000);
         dptr += BULK_READ_LENGTH * i;
     }
-    usb_bulk_read(this->handle, BUFFER_END_POINT, dptr, 10752, 5000);
-    usb_bulk_read(this->handle, BUFFER_END_POINT, end, 512, 5000);
+    usb_bulk_read(this->handle, BUFFER_ENDPOINT, dptr, 10752, 5000);
+    usb_bulk_read(this->handle, BUFFER_ENDPOINT, end, 512, 5000);
     data += 3; /* First 3 bytes can be ignored */
 
     char *image = (char *)malloc(1310720);
