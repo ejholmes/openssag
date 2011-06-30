@@ -116,11 +116,12 @@ void write_image()
     FILE *data = fopen("data", "r");
     FILE *image = fopen("image", "w");
 
-    fread(buffer, 1, 1527, data);
-    fwrite(&buffer[2], 1, 1280, image); /* First 2 bytes can be discarded */
+    /* fread(buffer, 1, 1527, data); */
+    /* fwrite(&buffer[2], 1, 1280, image); [> First 2 bytes can be discarded <] */
+    fseek(data, 3, SEEK_SET);
 
     int i;
-    for (i = 0; i < 1023; i++) {
+    for (i = 0; i < 1024; i++) {
         fread(buffer, 1, 1524, data);
         fwrite(buffer, 1, 1280, image);
     }
