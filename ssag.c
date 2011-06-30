@@ -8,8 +8,8 @@
 
 enum requests {
     request_start_exposure = 18,
-    request_init_1 = 19,
-    request_init_2 = 20
+    request_magic_init_1 = 19,
+    request_magic_init_2 = 20
 };
 
 /* Opens a usb_dev_handle based on the vendor id and product id */
@@ -62,7 +62,7 @@ havedevice:
 /* Magic init functions. Not sure what this actually does yet. */
 void send_init_sequence(usb_dev_handle *handle)
 {
-    unsigned char init_1_data[] = {
+    unsigned char magic_init_data[] = {
         0x00, 0x3b, 0x00, 0x3b,
         0x00, 0x3b, 0x00, 0x3b,
         0x00, 0x0c, 0x00, 0x14,
@@ -70,9 +70,9 @@ void send_init_sequence(usb_dev_handle *handle)
         0x04, 0x19
     };
 
-    usb_control_msg(handle, 0x40, request_init_1, 0x6ac8, 24, init_1_data, 18, 5000);
-    usb_control_msg(handle, 0x40, request_init_1, 0x6ac8, 24, init_1_data, 18, 5000);
-    usb_control_msg(handle, 0x40, request_init_2, 0x3095, 0, NULL, 0, 5000);
+    usb_control_msg(handle, 0x40, request_magic_init_1, 0x6ac8, 24, magic_init_data, 18, 5000);
+    usb_control_msg(handle, 0x40, request_magic_init_1, 0x6ac8, 24, magic_init_data, 18, 5000);
+    usb_control_msg(handle, 0x40, request_magic_init_2, 0x3095, 0, NULL, 0, 5000);
 }
 
 void start_exposure(usb_dev_handle *handle)
@@ -95,7 +95,6 @@ void read_image(usb_dev_handle *handle)
     for (i = 0; i < 97; i++) {
         usb_bulk_read(handle, 2, data, sizeof(data), 5000);
         fwrite(data, 1, sizeof(data), fp);
-        printf("Here %d\n", i);
     }
     usb_bulk_read(handle, 2, data, 10752, 5000);
     fwrite(data, 1, 10752, fp);
@@ -131,6 +130,8 @@ int main(int argc, const char *argv[])
         start_exposure(handle);
         read_image(handle);
         write_image();
+        // In terminal:
+        // convert -size 1280x1024 -depth 8 gray:image image.jpg 
     }
     usb_close(handle);
     return 0;
