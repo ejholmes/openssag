@@ -79,7 +79,7 @@ unsigned char *SSAG::ReadBuffer()
     dptr = data;
     for (int i = 0; i < 97; i++) {
         usb_bulk_read(this->handle, BUFFER_ENDPOINT, dptr, BULK_READ_LENGTH, 5000);
-        dptr += BULK_READ_LENGTH * (i + 1);
+        dptr += BULK_READ_LENGTH;
     }
     usb_bulk_read(this->handle, BUFFER_ENDPOINT, dptr, 10752, 5000);
     usb_bulk_read(this->handle, BUFFER_ENDPOINT, end, 512, 5000);
