@@ -103,8 +103,10 @@ void write_image()
 void guide(usb_dev_handle *handle, enum cardinal_directions direction, int duration)
 {
     char data[8];
+    /* Another instance of duplicate data. Why do they do this? =\ */
     memcpy(data, &duration, 4);
     memcpy(data+4, &duration, 4);
+
     usb_control_msg(handle, 0x40, request_guide, 0, (int)direction, data, sizeof(data), 5000);
 }
 
