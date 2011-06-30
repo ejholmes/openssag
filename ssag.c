@@ -4,7 +4,7 @@
 #include <usb.h>
 
 /* Exposure time in milliseconds */
-#define EXPOSURE_TIME 5000
+#define EXPOSURE_TIME 1000
 
 enum requests {
     request_start_exposure = 18,
@@ -84,16 +84,43 @@ void start_exposure(usb_dev_handle *handle)
 
 void read_image(usb_dev_handle *handle)
 {
-    unsigned char image[1600000]; /* SSAG returns 1,600,000 total bytes of data */
+    FILE *fp = fopen("data", "w");
+    /* SSAG returns 1,600,000 total bytes of data */
+    unsigned char image[1600000];
+    /* SSAG dll splits up the 1,600,000 bytes into 97 * 16384 + 10752 */
     unsigned char data[16384];
     unsigned char end[512];
     
     int i;
     for (i = 0; i < 97; i++) {
         usb_bulk_read(handle, 2, data, sizeof(data), 5000);
+        fwrite(data, 1, sizeof(data), fp);
+        printf("Here %d\n", i);
     }
     usb_bulk_read(handle, 2, data, 10752, 5000);
+    fwrite(data, 1, 10752, fp);
     usb_bulk_read(handle, 2, end, 512, 5000);
+
+    fclose(fp);
+}
+
+void write_image()
+{
+    char buffer[16000];
+    FILE *data = fopen("data", "r");
+    FILE *image = fopen("image", "w");
+
+    fread(buffer, 1, 1527, data);
+    fwrite(&buffer[2], 1, 1280, image);
+
+    int i;
+    for (i = 0; i < 1023; i++) {
+        fread(buffer, 1, 1524, data);
+        fwrite(buffer, 1, 1280, image);
+    }
+
+    fclose(data);
+    fclose(image);
 }
 
 int main(int argc, const char *argv[])
@@ -103,6 +130,7 @@ int main(int argc, const char *argv[])
         send_init_sequence(handle);
         start_exposure(handle);
         read_image(handle);
+        write_image();
     }
     usb_close(handle);
     return 0;
