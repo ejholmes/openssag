@@ -14,6 +14,8 @@
 #define BUFFER_ENDPOINT 2
 #define BULK_READ_LENGTH 16384
 
+#define BUFFER_SIZE 1600000
+
 #define SENSOR_WIDTH 1280
 #define SENSOR_HEIGHT 1024
 #define SENSOR_ROW_LENGTH 1524
@@ -70,7 +72,7 @@ void SSAG::InitSequence()
 unsigned char *SSAG::ReadBuffer()
 {
     /* SSAG returns 1,600,000 total bytes of data */
-    char *data = (char *)malloc(1600000);
+    char *data = (char *)malloc(BUFFER_SIZE);
     char end[512];
     char *dptr, *iptr;
     
@@ -83,7 +85,7 @@ unsigned char *SSAG::ReadBuffer()
     usb_bulk_read(this->handle, BUFFER_ENDPOINT, end, 512, 5000);
     data += 3; /* First 3 bytes can be ignored */
 
-    char *image = (char *)malloc(1310720);
+    char *image = (char *)malloc(SENSOR_WIDTH * SENSOR_HEIGHT);
 
     dptr = data;
     iptr = image;
