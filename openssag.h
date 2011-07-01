@@ -9,6 +9,7 @@
 
 typedef struct usb_dev_handle usb_dev_handle;
 
+/* Struct used to return image data */
 typedef struct raw_image {
     int width;
     int height;
@@ -17,10 +18,10 @@ typedef struct raw_image {
 
 /* Guide Directions (cardinal directions) */
 enum guide_direction {
-    guide_east = 0x10,
+    guide_east  = 0x10,
     guide_south = 0x20,
     guide_north = 0x40,
-    guide_west = 0x80,
+    guide_west  = 0x80,
 };
 
 namespace OpenSSAG
@@ -29,7 +30,7 @@ namespace OpenSSAG
     {
     private:
         /* Holds the converted gain */
-        unsigned short gain;
+        unsigned char gain;
 
         /* Handle to the device */
         usb_dev_handle *handle;
@@ -77,7 +78,7 @@ namespace OpenSSAG
         /* Connects to SSAG Base */
         bool Connect();
 
-        /* Disconnect from SSAG Base */
+        /* Disconnects from SSAG Base */
         void Disconnect();
 
         /* Loads the firmware into SSAG's RAM */
