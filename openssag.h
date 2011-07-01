@@ -4,6 +4,9 @@
 #define VENDOR_ID 0x1856 /* Orion Telescopes VID */
 #define PRODUCT_ID 0x0012 /* SSAG IO PID */
 
+#define CYPRESS_VENDOR_ID 0x1856 /* Orion Telescopes VID */
+#define CYPRESS_PRODUCT_ID 0x0011 /* Cypress PID for loading firmware */
+
 typedef struct usb_dev_handle usb_dev_handle;
 
 typedef struct raw_image {
@@ -54,7 +57,36 @@ namespace OpenSSAG
 
         /* Frees a raw_image struct */
         void FreeRawImage(raw_image *image);
+
+    };
+
+    /* See Cypress EZUSB fx2 datasheet for more information
+     * http://www.keil.com/dd/docs/datashts/cypress/fx2_trm.pdf */
+    class Cypress
+    {
+    private:
+        /* Puts the device into reset mode by writing 0x01 to CPUCS */
+        void EnterResetMode();
+
+        /* Makes the device exit reset mode by writing 0x00 to CPUCS */
+        void ExitResetMode();
+
+        /* Handle to the cypress device */
+        usb_dev_handle *handle;
+    public:
+        /* Connects to SSAG Base */
+        bool Connect();
+
+        /* Disconnect from SSAG Base */
+        void Disconnect();
+
+        /* Loads the firmware into SSAG's RAM */
+        void LoadFirmware();
     };
 }
+
+// TODO: Extract firmware
+#define SSAG_FIRMWARE \
+    0, 0, 0, 0
 
 #endif /* __OPEN_SSAG_H__ */

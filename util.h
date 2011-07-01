@@ -1,6 +1,8 @@
 #ifndef __UTIL_H__
 #define __UTIL_H___ 
 
+#include <usb.h>
+
 /* Opens a usb_dev_handle based on the vendor id and product id */
 static inline int usb_open_device(usb_dev_handle **device, int vendorID, int productId, const char *serial)
 {
