@@ -53,6 +53,9 @@ namespace OpenSSAG
         /* Expose and return the image in raw gray format. Function is blocking. */
         raw_image *Expose(int duration);
 
+        /* Cancels an exposure */
+        void CancelExposure();
+
         /* Issue a guide command through the guider relays */
         void Guide(enum guide_direction direction, int duration);
 

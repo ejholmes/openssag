@@ -6,19 +6,22 @@
 #include "util.h"
 #include "openssag.h"
 
-#define USB_RQ_GUIDE 16
-#define USB_RQ_EXPOSE 18
-#define USB_RQ_SET_INIT_PACKET 19
-#define USB_RQ_PRE_EXPOSE 20
+#define USB_RQ_GUIDE 16 /* 0x10 */
+#define USB_RQ_EXPOSE 18 /* 0x12 */
+#define USB_RQ_SET_INIT_PACKET 19 /* 0x13 */
+#define USB_RQ_PRE_EXPOSE 20 /* 0x14 */
+#define USB_RQ_CANCEL_GUIDE 24 /* 0x18 */
+#define USB_RQ_CANCEL_GUIDE_NORTH_SOUTH 34 /* 0x22 */
+#define USB_RQ_CANCEL_GUIDE_EAST_WEST 33 /* 0x21 */
 
 #define BUFFER_ENDPOINT 2
 #define BULK_READ_LENGTH 16384
 
-#define BUFFER_SIZE 1600000
+#define BUFFER_SIZE 1600200
+#define BUFFER_ROW_LENGTH 1524
 
-#define SENSOR_WIDTH 1280
-#define SENSOR_HEIGHT 1024
-#define SENSOR_ROW_LENGTH 1524
+#define IMAGE_WIDTH 1280
+#define IMAGE_HEIGHT 1024
 
 
 using namespace OpenSSAG;
@@ -28,6 +31,8 @@ bool SSAG::Connect()
     if (!usb_open_device(&this->handle, VENDOR_ID, PRODUCT_ID, NULL)) {
         return false;
     }
+
+    return true;
 }
 
 void SSAG::Disconnect()
@@ -39,15 +44,20 @@ void SSAG::Disconnect()
 
 raw_image *SSAG::Expose(int duration)
 {
-    raw_image *image = (raw_image *)malloc(sizeof(raw_image));
     this->InitSequence();
     usb_control_msg(this->handle, 0xc0, USB_RQ_EXPOSE, duration, 0, NULL, 2, 5000);
 
-    image->width = SENSOR_WIDTH;
-    image->height = SENSOR_HEIGHT;
+    raw_image *image = (raw_image *)malloc(sizeof(raw_image));
+    image->width = IMAGE_WIDTH;
+    image->height = IMAGE_HEIGHT;
     image->data = this->ReadBuffer();
 
     return image;
+}
+
+void SSAG::CancelExposure()
+{
+    // Send 0x00 over EP 0 ?
 }
 
 void SSAG::Guide(enum guide_direction direction, int duration)
@@ -68,24 +78,32 @@ void SSAG::InitSequence()
         0x00, this->gain, /* R  Gain */
         0x00, this->gain, /* G2 Gain */
 
-        /* Offset */
-        0x00, 0x0c,
+        /* Vertical Offset */
+        0x00, 0x0c, /* Offset by 12 pixels */
 
         0x00, 0x14,
-        0x03, 0xff, 0x04, 0xff,
 
-        0x04, 0x19 /* End */
+        /* Image height - 1 */
+        (IMAGE_HEIGHT - 1) >> 8, (IMAGE_HEIGHT - 1) & 0xff,
+
+        /* Image width - 1 */
+        (IMAGE_WIDTH - 1) >> 8, (IMAGE_HEIGHT - 1) & 0xff,
+
+        /* End? */
+        0x04, 0x19 /* 1049 */
     };
 
-    usb_control_msg(this->handle, 0x40, USB_RQ_SET_INIT_PACKET, 0x6ac8, 24, init_packet, sizeof(init_packet), 5000);
+    int wValue = BUFFER_SIZE & 0xffff;
+    int wIndex = BUFFER_SIZE  >> 16;
+
+    usb_control_msg(this->handle, 0x40, USB_RQ_SET_INIT_PACKET, wValue, wIndex, init_packet, sizeof(init_packet), 5000);
     usb_control_msg(this->handle, 0x40, USB_RQ_PRE_EXPOSE, 0x3095, 0, NULL, 0, 5000);
 }
 
 unsigned char *SSAG::ReadBuffer()
 {
-    /* SSAG returns 1,600,000 total bytes of data */
+    /* SSAG returns 1,600,200 total bytes of data */
     char *data = (char *)malloc(BUFFER_SIZE);
-    char end[512];
     char *dptr, *iptr;
     
     dptr = data;
@@ -94,17 +112,18 @@ unsigned char *SSAG::ReadBuffer()
         dptr += BULK_READ_LENGTH;
     }
     usb_bulk_read(this->handle, BUFFER_ENDPOINT, dptr, 10752, 5000);
-    usb_bulk_read(this->handle, BUFFER_ENDPOINT, end, 512, 5000);
+    dptr += 10752;
+    usb_bulk_read(this->handle, BUFFER_ENDPOINT, dptr, 512, 5000);
     data += 3; /* First 3 bytes can be ignored */
 
-    char *image = (char *)malloc(SENSOR_WIDTH * SENSOR_HEIGHT);
+    char *image = (char *)malloc(IMAGE_WIDTH * IMAGE_HEIGHT);
 
     dptr = data;
     iptr = image;
-    for (int i = 0; i < SENSOR_HEIGHT; i++) {
-        memcpy(iptr, dptr, SENSOR_WIDTH);
-        dptr += SENSOR_ROW_LENGTH; /* Bytes between SENSOR_WIDTH and SENSOR_ROW_LENGTH can be ignored */
-        iptr += SENSOR_WIDTH;
+    for (int i = 0; i < IMAGE_HEIGHT; i++) {
+        memcpy(iptr, dptr, IMAGE_WIDTH);
+        dptr += BUFFER_ROW_LENGTH; /* Bytes between IMAGE_WIDTH and BUFFER_ROW_LENGTH can be ignored */
+        iptr += IMAGE_WIDTH;
     }
 
     free(data);
