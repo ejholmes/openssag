@@ -1,4 +1,4 @@
-#ifndef __OPEN_SSAG_H__
+#ifndef __OPEN_SSAG_H__ 
 #define __OPEN_SSAG_H__ 
 
 #define VENDOR_ID 0x1856 /* Orion Telescopes VID */
@@ -92,9 +92,5 @@ namespace OpenSSAG
         void LoadFirmware();
     };
 }
-
-// TODO: Extract firmware
-#define SSAG_FIRMWARE \
-    0, 0, 0, 0
-
-#endif /* __OPEN_SSAG_H__ */
+ 
+#endif /* __OPEN_SSAG_H__ */ 

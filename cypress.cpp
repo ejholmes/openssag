@@ -5,6 +5,7 @@
 
 #include "util.h"
 #include "openssag.h"
+#include "firmware.h"
 
 using namespace OpenSSAG;
 
