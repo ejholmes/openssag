@@ -23,7 +23,6 @@
 #define IMAGE_WIDTH 1280
 #define IMAGE_HEIGHT 1024
 
-
 using namespace OpenSSAG;
 
 bool SSAG::Connect()
@@ -62,9 +61,15 @@ void SSAG::CancelExposure()
 
 void SSAG::Guide(enum guide_direction direction, int duration)
 {
+    this->Guide(direction, duration, duration);
+}
+
+void SSAG::Guide(enum guide_direction direction, int yduration, int xduration)
+{
     char data[8];
-    memcpy(data, &duration, 4);
-    memcpy(data+4, &duration, 4);
+
+    memcpy(data    , &xduration, 4);
+    memcpy(data + 4, &yduration, 4);
 
     usb_control_msg(this->handle, 0x40, USB_RQ_GUIDE, 0, (int)direction, data, sizeof(data), 5000);
 }
@@ -81,6 +86,8 @@ void SSAG::InitSequence()
         /* Vertical Offset */
         0x00, 0x0c, /* Offset by 12 pixels */
 
+        /* It would make sense for this to be the horizontal offset, but i'm
+         * not sure. */
         0x00, 0x14,
 
         /* Image height - 1 */

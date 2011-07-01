@@ -56,7 +56,11 @@ namespace OpenSSAG
         /* Cancels an exposure */
         void CancelExposure();
 
-        /* Issue a guide command through the guider relays */
+        /* Issue a guide command through the guider relays. Guide directions
+         * can be OR'd together to move in X and Y at the same time.
+         *
+         * EX. Guide(guide_north | guide_west, 100, 200); */
+        void Guide(enum guide_direction direction, int yduration, int xduration);
         void Guide(enum guide_direction direction, int duration);
 
         /* Frees a raw_image struct */
