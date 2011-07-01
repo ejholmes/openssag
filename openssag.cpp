@@ -87,7 +87,7 @@ void SSAG::InitSequence()
         (IMAGE_HEIGHT - 1) >> 8, (IMAGE_HEIGHT - 1) & 0xff,
 
         /* Image width - 1 */
-        (IMAGE_WIDTH - 1) >> 8, (IMAGE_HEIGHT - 1) & 0xff,
+        (IMAGE_WIDTH - 1) >> 8, (IMAGE_WIDTH - 1) & 0xff,
 
         /* End? */
         0x04, 0x19 /* 1049 */
