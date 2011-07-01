@@ -1,3 +1,5 @@
+/* This file is NOT part of the driver. Just for testing */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
