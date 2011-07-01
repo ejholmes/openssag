@@ -62,7 +62,19 @@ void SSAG::Guide(enum guide_direction direction, int duration)
 void SSAG::InitSequence()
 {
     char init_packet[18] = {
-        // TODO
+        /* Gain settings */
+        0x00, this->gain, /* G1 Gain */
+        0x00, this->gain, /* B  Gain */
+        0x00, this->gain, /* R  Gain */
+        0x00, this->gain, /* G2 Gain */
+
+        /* Offset */
+        0x00, 0x0c,
+
+        0x00, 0x14,
+        0x03, 0xff, 0x04, 0xff,
+
+        0x04, 0x19 /* End */
     };
 
     usb_control_msg(this->handle, 0x40, USB_RQ_SET_INIT_PACKET, 0x6ac8, 24, init_packet, sizeof(init_packet), 5000);
