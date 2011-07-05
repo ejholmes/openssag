@@ -21,8 +21,7 @@ for line in lines:
     for i in range(0, int(byte_count, 16)):
         sum += int(data[(i*2)] + data[(i*2)+1], 16)
     twos_comp = (~sum + 1) & 0xff;
-    twos_comp = hex(twos_comp)
-    twos_comp = twos_comp.lstrip("0x")
+    twos_comp = "%02x" % twos_comp
     hexline += twos_comp
     print hexline
 
