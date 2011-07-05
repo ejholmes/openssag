@@ -6,13 +6,16 @@
 #include "util.h"
 #include "openssag.h"
 
-#define USB_RQ_GUIDE 16 /* 0x10 */
-#define USB_RQ_EXPOSE 18 /* 0x12 */
-#define USB_RQ_SET_INIT_PACKET 19 /* 0x13 */
-#define USB_RQ_PRE_EXPOSE 20 /* 0x14 */
-#define USB_RQ_CANCEL_GUIDE 24 /* 0x18 */
-#define USB_RQ_CANCEL_GUIDE_NORTH_SOUTH 34 /* 0x22 */
-#define USB_RQ_CANCEL_GUIDE_EAST_WEST 33 /* 0x21 */
+enum USB_REQUESTS {
+    USB_RQ_GUIDE = 16, /* 0x10 */
+    USB_RQ_EXPOSE = 18, /* 0x12 */
+    USB_RQ_SET_INIT_PACKET = 19, /* 0x13 */
+    USB_RQ_PRE_EXPOSE = 20, /* 0x14 */
+    USB_RQ_CANCEL_GUIDE = 24, /* 0x18 */
+    USB_RQ_CANCEL_GUIDE_NORTH_SOUTH = 34, /* 0x22 */
+    USB_RQ_CANCEL_GUIDE_EAST_WEST = 33 /* 0x21 */
+};
+
 
 #define BUFFER_ENDPOINT 2
 #define BULK_READ_LENGTH 16384
@@ -38,15 +41,15 @@ void SSAG::Disconnect()
 {
     if (this->handle)
         usb_close(this->handle);
-    handle = NULL;
+    this->handle = NULL;
 }
 
-raw_image *SSAG::Expose(int duration)
+struct raw_image *SSAG::Expose(int duration)
 {
     this->InitSequence();
     usb_control_msg(this->handle, 0xc0, USB_RQ_EXPOSE, duration, 0, NULL, 2, 5000);
 
-    raw_image *image = (raw_image *)malloc(sizeof(raw_image));
+    struct raw_image *image = (raw_image *)malloc(sizeof(raw_image));
     image->width = IMAGE_WIDTH;
     image->height = IMAGE_HEIGHT;
     image->data = this->ReadBuffer();

@@ -12,6 +12,9 @@
 #define EXPOSURE_TIME 1000
 #define GAIN 0x3b
 
+#define IMAGE_WIDTH 1280
+#define IMAGE_HEIGHT 1024
+
 enum requests {
     request_guide = 16, /* Issues a guide command through the guider relays */
     request_start_exposure = 18, /* Starts an exposure sequence */
@@ -41,10 +44,15 @@ void send_init_sequence(usb_dev_handle *handle)
         0x00, GAIN, 0x00, GAIN,
         0x00, GAIN, 0x00, GAIN,
         
-        /* Controls enhanced noise reduction. Doubt this is really of any use,
-         * current value turns it off */
-        0x00, 0x0c, 0x00, 0x14,
-        0x03, 0xff, 0x04, 0xff,
+        0x00, 0x0c,
+        
+        0x00, 0x14,
+
+        /* Image height - 1 */
+        (IMAGE_HEIGHT - 1) >> 8, (IMAGE_HEIGHT - 1) & 0xff,
+
+        /* Image width - 1 */
+        (IMAGE_WIDTH - 1) >> 8, (IMAGE_WIDTH - 1) & 0xff,
 
         0x04, 0x19 /* End ? */
     };

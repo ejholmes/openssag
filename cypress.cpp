@@ -13,6 +13,9 @@ static unsigned char firmware[] = { SSAG_FIRMWARE };
 
 bool Cypress::Connect()
 {
+    if (!usb_open_device(&this->handle, CYPRESS_VENDOR_ID, CYPRESS_PRODUCT_ID, NULL)) {
+        return false;
+    }
     this->EnterResetMode();
     return false;
 }

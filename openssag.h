@@ -9,37 +9,37 @@
 
 typedef struct usb_dev_handle usb_dev_handle;
 
-/* Struct used to return image data */
-typedef struct raw_image {
-    int width;
-    int height;
-    unsigned char *data;
-} raw_image;
-
-/* Guide Directions (cardinal directions) */
-enum guide_direction {
-    guide_east  = 0x10,
-    guide_south = 0x20,
-    guide_north = 0x40,
-    guide_west  = 0x80,
-};
-
 namespace OpenSSAG
 {
+    /* Struct used to return image data */
+    struct raw_image {
+        unsigned int width;
+        unsigned int height;
+        unsigned char *data;
+    };
+
+    /* Guide Directions (cardinal directions) */
+    enum guide_direction {
+        guide_east  = 0x10,
+        guide_south = 0x20,
+        guide_north = 0x40,
+        guide_west  = 0x80,
+    };
+
     class SSAG
     {
     private:
-        /* Holds the converted gain */
-        unsigned char gain;
-
-        /* Handle to the device */
-        usb_dev_handle *handle;
-
         /* Sends init packet and pre expose request */
         void InitSequence();
 
         /* Gets the data from the autoguiders internal buffer */
         unsigned char *ReadBuffer();
+
+        /* Holds the converted gain */
+        unsigned char gain;
+
+        /* Handle to the device */
+        usb_dev_handle *handle;
     public:
         /* Connect to the autoguider */
         bool Connect();
@@ -51,7 +51,7 @@ namespace OpenSSAG
         void SetGain(int gain);
 
         /* Expose and return the image in raw gray format. Function is blocking. */
-        raw_image *Expose(int duration);
+        struct raw_image *Expose(int duration);
 
         /* Cancels an exposure */
         void CancelExposure();

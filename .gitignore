@@ -1,0 +1,8 @@
+*.o
+*.a
+*.lo
+*.la
+*.sys
+*.exe
+*.hex
+*.bin
