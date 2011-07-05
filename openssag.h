@@ -36,11 +36,14 @@ namespace OpenSSAG
         unsigned char *ReadBuffer();
 
         /* Holds the converted gain */
-        unsigned char gain;
+        unsigned int gain;
 
         /* Handle to the device */
         usb_dev_handle *handle;
     public:
+        /* Constructor */
+        SSAG();
+
         /* Connect to the autoguider */
         bool Connect();
 

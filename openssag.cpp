@@ -6,7 +6,7 @@
 #include "util.h"
 #include "openssag.h"
 
-enum USB_REQUESTS {
+enum USB_REQUEST {
     USB_RQ_GUIDE = 16, /* 0x10 */
     USB_RQ_EXPOSE = 18, /* 0x12 */
     USB_RQ_SET_INIT_PACKET = 19, /* 0x13 */
@@ -27,6 +27,11 @@ enum USB_REQUESTS {
 #define IMAGE_HEIGHT 1024
 
 using namespace OpenSSAG;
+
+SSAG::SSAG()
+{
+    this->gain = 0x3b;
+}
 
 bool SSAG::Connect()
 {
@@ -124,11 +129,10 @@ unsigned char *SSAG::ReadBuffer()
     usb_bulk_read(this->handle, BUFFER_ENDPOINT, dptr, 10752, 5000);
     dptr += 10752;
     usb_bulk_read(this->handle, BUFFER_ENDPOINT, dptr, 512, 5000);
-    data += 3; /* First 3 bytes can be ignored */
 
     char *image = (char *)malloc(IMAGE_WIDTH * IMAGE_HEIGHT);
 
-    dptr = data;
+    dptr = data+3; /* First 3 bytes can be ignored */
     iptr = image;
     for (int i = 0; i < IMAGE_HEIGHT; i++) {
         memcpy(iptr, dptr, IMAGE_WIDTH);
