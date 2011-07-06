@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+# Converts intel hex records to a C array
+
 import sys
 
 input = open(sys.argv[1], "r")
