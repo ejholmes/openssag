@@ -30,6 +30,8 @@ enum USB_REQUEST {
 
 #define SHUTTER_WIDTH 1049
 
+#define PIXEL_OFFSET 12440
+
 using namespace OpenSSAG;
 
 SSAG::SSAG()
@@ -133,7 +135,7 @@ void SSAG::InitSequence()
     int wIndex = BUFFER_SIZE  >> 16;
 
     usb_control_msg(this->handle, 0x40, USB_RQ_SET_INIT_PACKET, wValue, wIndex, init_packet, sizeof(init_packet), 5000);
-    usb_control_msg(this->handle, 0x40, USB_RQ_PRE_EXPOSE, 0x3095, 0, NULL, 0, 5000);
+    usb_control_msg(this->handle, 0x40, USB_RQ_PRE_EXPOSE, PIXEL_OFFSET, 0, NULL, 0, 5000);
 }
 
 unsigned char *SSAG::ReadBuffer(int timeout)
@@ -146,7 +148,7 @@ unsigned char *SSAG::ReadBuffer(int timeout)
 
     char *image = (char *)malloc(IMAGE_WIDTH * IMAGE_HEIGHT);
 
-    dptr = data+3; /* First 3 bytes can be ignored */
+    dptr = data;
     iptr = image;
     for (int i = 0; i < IMAGE_HEIGHT; i++) {
         memcpy(iptr, dptr, IMAGE_WIDTH);
