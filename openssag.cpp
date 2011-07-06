@@ -26,6 +26,11 @@ enum USB_REQUEST {
 #define IMAGE_WIDTH 1280
 #define IMAGE_HEIGHT 1024
 
+#define ROW_START 12
+#define COLUMN_START 20
+
+#define SHUTTER_WIDTH 1049
+
 using namespace OpenSSAG;
 
 SSAG::SSAG()
@@ -83,12 +88,12 @@ void SSAG::CancelExposure()
     // Send 0x00 over EP 0 ?
 }
 
-void SSAG::Guide(enum guide_direction direction, int duration)
+void SSAG::Guide(int direction, int duration)
 {
     this->Guide(direction, duration, duration);
 }
 
-void SSAG::Guide(enum guide_direction direction, int yduration, int xduration)
+void SSAG::Guide(int direction, int yduration, int xduration)
 {
     char data[8];
 
@@ -107,20 +112,20 @@ void SSAG::InitSequence()
         0x00, this->gain, /* R  Gain */
         0x00, this->gain, /* G2 Gain */
 
-        /* Vertical Offset */
-        0x00, 0x0c, /* Offset by 12 pixels */
+        /* Vertical Offset. Reg0x01 */
+        0x00, ROW_START,
 
-        /* Horizontal Offset */
-        0x00, 0x14, /* Offset by 20 pixels */
+        /* Horizontal Offset. Reg0x02 */
+        0x00, COLUMN_START,
 
-        /* Image height - 1 */
+        /* Image height - 1. Reg0x03 */
         (IMAGE_HEIGHT - 1) >> 8, (IMAGE_HEIGHT - 1) & 0xff,
 
-        /* Image width - 1 */
+        /* Image width - 1. Reg0x04 */
         (IMAGE_WIDTH - 1) >> 8, (IMAGE_WIDTH - 1) & 0xff,
 
-        /* End? */
-        0x04, 0x19 /* 1049 */
+        /* Shutter Width. Reg0x09 */
+        (SHUTTER_WIDTH) >> 8, (SHUTTER_WIDTH) & 0xff
     };
 
     int wValue = BUFFER_SIZE & 0xffff;
