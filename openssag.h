@@ -33,7 +33,7 @@ namespace OpenSSAG
         void InitSequence();
 
         /* Gets the data from the autoguiders internal buffer */
-        unsigned char *ReadBuffer();
+        unsigned char *ReadBuffer(int timeout);
 
         /* Holds the converted gain */
         unsigned int gain;

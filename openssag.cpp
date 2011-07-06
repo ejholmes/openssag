@@ -77,7 +77,7 @@ struct raw_image *SSAG::Expose(int duration)
     struct raw_image *image = (raw_image *)malloc(sizeof(raw_image));
     image->width = IMAGE_WIDTH;
     image->height = IMAGE_HEIGHT;
-    image->data = this->ReadBuffer();
+    image->data = this->ReadBuffer(duration + 5000);
 
     return image;
 }
@@ -134,14 +134,13 @@ void SSAG::InitSequence()
     usb_control_msg(this->handle, 0x40, USB_RQ_PRE_EXPOSE, 0x3095, 0, NULL, 0, 5000);
 }
 
-unsigned char *SSAG::ReadBuffer()
+unsigned char *SSAG::ReadBuffer(int timeout)
 {
     /* SSAG returns 1,600,200 total bytes of data */
     char *data = (char *)malloc(BUFFER_SIZE);
     char *dptr, *iptr;
     
-    dptr = data;
-    usb_bulk_read(this->handle, BUFFER_ENDPOINT, dptr, BUFFER_SIZE, 5000);
+    usb_bulk_read(this->handle, BUFFER_ENDPOINT, data, BUFFER_SIZE, timeout);
 
     char *image = (char *)malloc(IMAGE_WIDTH * IMAGE_HEIGHT);
 
@@ -160,6 +159,7 @@ unsigned char *SSAG::ReadBuffer()
 
 void SSAG::SetGain(int gain)
 {
+    /* See the MT9M001 datasheet for more information on the following code. */
     if (gain < 1 || gain > 15) {
         return;
     } else if (gain <= 4) {
