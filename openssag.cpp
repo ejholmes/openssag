@@ -18,7 +18,6 @@ enum USB_REQUEST {
 
 
 #define BUFFER_ENDPOINT 2
-#define BULK_READ_LENGTH 16384
 
 #define BUFFER_SIZE 1600200
 #define BUFFER_ROW_LENGTH 1524
@@ -142,13 +141,7 @@ unsigned char *SSAG::ReadBuffer()
     char *dptr, *iptr;
     
     dptr = data;
-    for (int i = 0; i < 97; i++) {
-        usb_bulk_read(this->handle, BUFFER_ENDPOINT, dptr, BULK_READ_LENGTH, 5000);
-        dptr += BULK_READ_LENGTH;
-    }
-    usb_bulk_read(this->handle, BUFFER_ENDPOINT, dptr, 10752, 5000);
-    dptr += 10752;
-    usb_bulk_read(this->handle, BUFFER_ENDPOINT, dptr, 512, 5000);
+    usb_bulk_read(this->handle, BUFFER_ENDPOINT, dptr, BUFFER_SIZE, 5000);
 
     char *image = (char *)malloc(IMAGE_WIDTH * IMAGE_HEIGHT);
 
