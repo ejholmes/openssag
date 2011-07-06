@@ -32,14 +32,30 @@ SSAG::SSAG()
 {
     this->gain = 0x3b;
 }
-
-bool SSAG::Connect()
+bool SSAG::Connect(bool bootload)
 {
     if (!usb_open_device(&this->handle, VENDOR_ID, PRODUCT_ID, NULL)) {
-        return false;
+        if (bootload) {
+            Loader *loader = new Loader();
+            if (loader->Connect()) {
+                loader->LoadFirmware();
+                loader->Disconnect();
+                sleep(2);
+                return this->Connect(false);
+            } else {
+                return false;
+            }
+        }else {
+            return false;
+        }
     }
 
     return true;
+}
+
+bool SSAG::Connect()
+{
+    this->Connect(false);
 }
 
 void SSAG::Disconnect()
