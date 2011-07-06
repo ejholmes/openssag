@@ -52,12 +52,11 @@ void Loader::ExitResetMode()
 void Loader::LoadFirmware()
 {
     unsigned char *data = NULL;
-    /* Load bootloader */
-    printf("Entering reset mode\n");
-    this->EnterResetMode();
-    this->EnterResetMode();
-    printf("Loading bootloader\n");
 
+    /* Load bootloader */
+    this->EnterResetMode();
+    this->EnterResetMode();
+    printf("Loading bootloader...");
     data = bootloader;
     for (;;) {
         unsigned char byte_count = *data;
@@ -67,17 +66,14 @@ void Loader::LoadFirmware()
         usb_control_msg(this->handle, 0x40, USB_RQ_LOAD_FIRMWARE, address, 0, (char *)(data+3), byte_count, 5000);
         data += byte_count + 3;
     }
-
-    printf("Bootloader loaded. Exiting reset mode\n");
+    printf("done\n");
     this->ExitResetMode(); /* Transfer execution to the reset vector */
 
     sleep(1);
 
     /* Load firmware */
-    printf("Entering reset mode\n");
     this->EnterResetMode();
-    printf("Loading firmware\n");
-
+    printf("Loading firmware...");
     data = firmware;
     for (;;) {
         unsigned char byte_count = *data;
@@ -87,8 +83,7 @@ void Loader::LoadFirmware()
         usb_control_msg(this->handle, 0x40, USB_RQ_LOAD_FIRMWARE, address, 0, (char *)(data+3), byte_count, 5000);
         data += byte_count + 3;
     }
-
-    printf("Firmware loaded. Exiting reset mode\n");
+    printf("done\n");
     this->EnterResetMode(); /* Make sure the CPU is in reset */
     this->ExitResetMode(); /* Transfer execution to the reset vector */
 }
