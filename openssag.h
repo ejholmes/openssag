@@ -4,8 +4,8 @@
 #define VENDOR_ID 0x1856 /* Orion Telescopes VID */
 #define PRODUCT_ID 0x0012 /* SSAG IO PID */
 
-#define CYPRESS_VENDOR_ID 0x1856 /* Orion Telescopes VID */
-#define CYPRESS_PRODUCT_ID 0x0011 /* Cypress PID for loading firmware */
+#define LOADER_VENDOR_ID 0x1856 /* Orion Telescopes VID */
+#define LOADER_PRODUCT_ID 0x0011 /* Loader PID for loading firmware */
 
 typedef struct usb_dev_handle usb_dev_handle;
 
@@ -71,9 +71,12 @@ namespace OpenSSAG
 
     };
 
-    /* See Cypress EZUSB fx2 datasheet for more information
+    /* This class is used for loading the firmware onto the device after it is
+     * plugged in.
+     *
+     * See Cypress EZUSB fx2 datasheet for more information
      * http://www.keil.com/dd/docs/datashts/cypress/fx2_trm.pdf */
-    class Cypress
+    class Loader
     {
     private:
         /* Puts the device into reset mode by writing 0x01 to CPUCS */
