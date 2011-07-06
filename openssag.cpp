@@ -3,6 +3,11 @@
 #include <string.h>
 #include <usb.h>
 
+#ifdef __WIN32__
+#include "windows.h"
+#define sleep(n) Sleep(1000 * n)
+#endif
+
 #include "util.h"
 #include "openssag.h"
 
@@ -15,7 +20,6 @@ enum USB_REQUEST {
     USB_RQ_CANCEL_GUIDE_NORTH_SOUTH = 34, /* 0x22 */
     USB_RQ_CANCEL_GUIDE_EAST_WEST = 33 /* 0x21 */
 };
-
 
 #define BUFFER_ENDPOINT 2
 
