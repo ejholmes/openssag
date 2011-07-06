@@ -84,7 +84,9 @@ struct raw_image *SSAG::Expose(int duration)
 
 void SSAG::CancelExposure()
 {
-    // Send 0x00 over EP 0 ?
+    /* Not tested */
+    char data = 0;
+    usb_bulk_read(this->handle, 0, (char *)&data, 1, 5000);
 }
 
 void SSAG::Guide(int direction, int duration)
