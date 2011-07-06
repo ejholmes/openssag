@@ -56,7 +56,7 @@ bool SSAG::Connect(bool bootload)
             } else {
                 return false;
             }
-        }else {
+        } else {
             return false;
         }
     }
