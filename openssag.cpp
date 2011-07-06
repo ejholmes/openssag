@@ -42,6 +42,7 @@ SSAG::SSAG()
 {
     this->SetGain(6);
 }
+
 bool SSAG::Connect(bool bootload)
 {
     if (!usb_open_device(&this->handle, VENDOR_ID, PRODUCT_ID, NULL)) {
