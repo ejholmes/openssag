@@ -30,7 +30,7 @@ using namespace OpenSSAG;
 
 SSAG::SSAG()
 {
-    this->gain = 0x3b;
+    this->SetGain(6);
 }
 bool SSAG::Connect(bool bootload)
 {
@@ -110,9 +110,8 @@ void SSAG::InitSequence()
         /* Vertical Offset */
         0x00, 0x0c, /* Offset by 12 pixels */
 
-        /* It would make sense for this to be the horizontal offset, but i'm
-         * not sure. */
-        0x00, 0x14,
+        /* Horizontal Offset */
+        0x00, 0x14, /* Offset by 20 pixels */
 
         /* Image height - 1 */
         (IMAGE_HEIGHT - 1) >> 8, (IMAGE_HEIGHT - 1) & 0xff,
@@ -163,7 +162,15 @@ unsigned char *SSAG::ReadBuffer()
 
 void SSAG::SetGain(int gain)
 {
-    // TODO: Set gain based on MT9M001 datasheet
+    if (gain < 1 || gain > 15) {
+        return;
+    } else if (gain <= 4) {
+        this->gain = gain * 8;
+    } else if (gain <= 8) {
+        this->gain = (gain * 4) + 0x40;
+    } else if (gain <= 15) {
+        this->gain = (gain - 8) + 0x60;
+    }
 }
 
 void SSAG::FreeRawImage(raw_image *image)

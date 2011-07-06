@@ -46,7 +46,7 @@ namespace OpenSSAG
 
         /* Connect to the autoguider. If bootload is set to true and the camera
          * cannot be found, it will attempt to connect to the base device and
-         * loader the firmware. Defaults to false. */
+         * load the firmware. Defaults to false. */
         bool Connect(bool bootload);
         bool Connect();
 
