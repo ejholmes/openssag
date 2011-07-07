@@ -35,7 +35,7 @@ int main()
 {
     OpenSSAG::SSAG *camera = new OpenSSAG::SSAG();
     
-    if (device->Connect(true)) {
+    if (camera->Connect(true)) {
         struct raw_image *image = camera->Expose(1000);
         FILE *fp = fopen("image", "w");
         fwrite(image->data, 1, image->width * image->height, fp);
