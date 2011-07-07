@@ -54,6 +54,18 @@ void Loader::ExitResetMode()
     usb_control_msg(this->handle, 0x40, USB_RQ_LOAD_FIRMWARE, CPUCS_ADDRESS, 0, &data, 1, 5000);
 }
 
+void Loader::Upload(unsigned char *data)
+{
+    for (;;) {
+        unsigned char byte_count = *data;
+        if (byte_count == 0)
+            break;
+        unsigned short address = *(unsigned int *)(data+1);
+        usb_control_msg(this->handle, 0x40, USB_RQ_LOAD_FIRMWARE, address, 0, (char *)(data+3), byte_count, 5000);
+        data += byte_count + 3;
+    }
+}
+
 void Loader::LoadFirmware()
 {
     unsigned char *data = NULL;
@@ -62,32 +74,16 @@ void Loader::LoadFirmware()
     this->EnterResetMode();
     this->EnterResetMode();
     printf("Loading bootloader...");
-    data = bootloader;
-    for (;;) {
-        unsigned char byte_count = *data;
-        if (byte_count == 0)
-            break;
-        unsigned short address = *(unsigned int *)(data+1);
-        usb_control_msg(this->handle, 0x40, USB_RQ_LOAD_FIRMWARE, address, 0, (char *)(data+3), byte_count, 5000);
-        data += byte_count + 3;
-    }
+    this->Upload(bootloader);
     printf("done\n");
     this->ExitResetMode(); /* Transfer execution to the reset vector */
 
-    sleep(1);
+    sleep(1); /* Wait for renumeration */
 
     /* Load firmware */
     this->EnterResetMode();
     printf("Loading firmware...");
-    data = firmware;
-    for (;;) {
-        unsigned char byte_count = *data;
-        if (byte_count == 0)
-            break;
-        unsigned short address = *(unsigned int *)(data+1);
-        usb_control_msg(this->handle, 0x40, USB_RQ_LOAD_FIRMWARE, address, 0, (char *)(data+3), byte_count, 5000);
-        data += byte_count + 3;
-    }
+    this->Upload(firmware);
     printf("done\n");
     this->EnterResetMode(); /* Make sure the CPU is in reset */
     this->ExitResetMode(); /* Transfer execution to the reset vector */
