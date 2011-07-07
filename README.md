@@ -26,8 +26,6 @@ Usage
 -----
 The following shows a simple example of how to use the library in a C++ application.  
 
-**C++**
-
 ```
 #include <stdio.h>
 
@@ -54,5 +52,5 @@ Compile on Linux/Mac OS X
 ```
 $ g++ main.cpp -lusb -lopenssag
 $ ./a.out
-$ convert -size 1280x1024 -depth 8 gray:image image.jpg # OS X does not have the convert utility
+$ convert -size 1280x1024 -depth 8 gray:image image.jpg
 ```
