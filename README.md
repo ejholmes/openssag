@@ -40,6 +40,7 @@ int main()
         FILE *fp = fopen("image", "w");
         fwrite(image->data, 1, image->width * image->height, fp);
         fclose(fp);
+        camera->Disconnect();
     }
     else {
         printf("Could not find StarShoot Autoguider\n");
