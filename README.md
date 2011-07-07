@@ -44,7 +44,7 @@ int main()
         fclose(fp);
     }
     else {
-        printf("Could not find StarShoot Autoguider device\n");
+        printf("Could not find StarShoot Autoguider\n");
     }
 }
 ```
