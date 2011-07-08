@@ -111,7 +111,8 @@ namespace OpenSSAG
         void LoadFirmware();
 
         /* Loads the SSAG eeprom onto the camera. You shouldn't use this if you
-         * don't know what you're doing */
+         * don't know what you're doing.
+         * See http://www.cypress.com/?id=4&rID=34127 for more information. */
         void LoadEEPROM();
     };
 }
