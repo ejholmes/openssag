@@ -16,7 +16,14 @@ $ make install
 ```
 
 **Mac OS X**  
-Requires Xcode
+Requires Developer Tools/Xcode
+
+```
+$ ./configure LIBUSB_CFLAGS="<location of usb.h>" LIBUSB_LIBS"<location of libusb.a>"
+$ make
+```
+
+Or, if you prefer Xcode:
 
 ```
 $ open OpenSSAG.xcodeproj

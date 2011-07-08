@@ -16,7 +16,7 @@ AC_PROG_LIBTOOL
 AC_CHECK_LIB([usb], [usb_control_msg])
 
 # Check for libusb
-PKG_CHECK_MODULES([libusb], [libusb],,[
+PKG_CHECK_MODULES([LIBUSB], [libusb],,[
                    AC_CHECK_LIB([usb], [usb_init],,[AC_MSG_ERROR[libusb not found]])
                    AC_CHECK_HEADERS([usb.h],,[AC_MSG_ERROR[usb.h not found]])
                    ])
