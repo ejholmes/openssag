@@ -1,15 +1,19 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <getopt.h>
+
+#ifdef HAVE_LIBMAGICKCORE
 #include <magick/MagickCore.h>
+#endif
 
 #include "openssag.h"
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
 
 using namespace OpenSSAG;
 
