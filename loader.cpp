@@ -18,12 +18,14 @@
 
 enum USB_REQUEST {
     USB_RQ_LOAD_FIRMWARE = 0xa0,
+    USB_RQ_WRITE_SMALL_EEPROM = 0xa2
 };
 
 using namespace OpenSSAG;
 
 static unsigned char bootloader[] = { SSAG_BOOTLOADER };
 static unsigned char firmware[] = { SSAG_FIRMWARE };
+static unsigned char eeprom[] = { SSAG_EEPROM };
 
 bool Loader::Connect()
 {
@@ -87,4 +89,11 @@ void Loader::LoadFirmware()
     printf("done\n");
     this->EnterResetMode(); /* Make sure the CPU is in reset */
     this->ExitResetMode(); /* Transfer execution to the reset vector */
+}
+
+void Loader::LoadEEPROM()
+{
+    size_t length = *eeprom;
+    char *data = (char *)(eeprom+3);
+    usb_control_msg(this->handle, 0x40, USB_RQ_WRITE_SMALL_EEPROM, 0x00, 0xBEEF, data, length, 5000);
 }

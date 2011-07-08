@@ -3,9 +3,12 @@
 
 #define OPENSSAG_VER 0x01, 0x00 /* Minor, Major */
 
+
 #define VENDOR_ID 0x1856 /* Orion Telescopes VID */
 #define PRODUCT_ID 0x0012 /* SSAG IO PID */
 
+// #define LOADER_VENDOR_ID 0x04b4 /* Default Cypress VID */
+// #define LOADER_PRODUCT_ID 0x8613 /* Default Cypress PID */
 #define LOADER_VENDOR_ID 0x1856 /* Orion Telescopes VID */
 #define LOADER_PRODUCT_ID 0x0011 /* Loader PID for loading firmware */
 
@@ -106,6 +109,10 @@ namespace OpenSSAG
 
         /* Loads the firmware into SSAG's RAM */
         void LoadFirmware();
+
+        /* Loads the SSAG eeprom onto the camera. You shouldn't use this if you
+         * don't know what you're doing */
+        void LoadEEPROM();
     };
 }
 #endif // __cplusplus
