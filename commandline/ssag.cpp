@@ -9,7 +9,7 @@ using namespace OpenSSAG;
 int main(int argc, const char *argv[])
 {
     SSAG *camera = new SSAG();
-    if (camera->Connect(true)) {
+    if (camera->Connect()) {
         struct raw_image *image = NULL;
 
         image = camera->Expose(1000);

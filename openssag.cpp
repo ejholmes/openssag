@@ -66,7 +66,7 @@ bool SSAG::Connect(bool bootload)
 
 bool SSAG::Connect()
 {
-    this->Connect(false);
+    this->Connect(true);
 }
 
 void SSAG::Disconnect()
