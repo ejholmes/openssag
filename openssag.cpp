@@ -87,6 +87,9 @@ struct raw_image *SSAG::Expose(int duration)
     image->height = IMAGE_HEIGHT;
     image->data = this->ReadBuffer(duration + 5000);
 
+    if (!image->data)
+        return NULL;
+
     return image;
 }
 

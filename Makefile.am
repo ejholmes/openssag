@@ -6,6 +6,6 @@ libopenssag_la_SOURCES = openssag.cpp loader.cpp
 libopenssag_la_LDFLAGS = -no-undefined -version-info 0:0:0
 include_HEADERS = openssag.h firmware.h util.h
 
-ssag_CPPFLAGS = $(LIBUSB_CFLAGS)
-ssag_LDADD = libopenssag.la $(LIBUSB_LIBS)
+ssag_CPPFLAGS = $(LIBUSB_CFLAGS) $(IMAGEMAGICK_CFLAGS)
+ssag_LDADD = libopenssag.la $(LIBUSB_LIBS) $(IMAGEMAGICK_LIBS)
 ssag_SOURCES = commandline/ssag.cpp

@@ -21,6 +21,8 @@ PKG_CHECK_MODULES([LIBUSB], [libusb],,[
                    AC_CHECK_HEADERS([usb.h],,[AC_MSG_ERROR[usb.h not found]])
                    ])
 
+PKG_CHECK_MODULES([IMAGEMAGICK], [MagickCore])
+
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h string.h])
 

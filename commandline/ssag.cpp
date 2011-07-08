@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <magick/MagickCore.h>
 
 #include "openssag.h"
 
@@ -63,7 +65,16 @@ int main(int argc, char **argv)
         }
         if (c == 'c') {
             int duration = 1000;
-            struct raw_image *image = camera->Expose(duration);
+            struct raw_image *raw = camera->Expose(duration);
+            if (raw) {
+                Image *image = NULL;
+                ImageInfo *image_info = CloneImageInfo((ImageInfo *)NULL);
+                MagickCoreGenesis(NULL, MagickTrue);
+                image = ConstituteImage(raw->width, raw->height, "I", CharPixel, raw->data, NULL);
+                strcpy(image->filename, "image.jpg");
+                WriteImage(image_info, image);
+                MagickCoreTerminus();
+            }
             goto done;
         }
     }
