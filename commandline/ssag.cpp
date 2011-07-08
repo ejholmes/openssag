@@ -28,12 +28,13 @@ int main(int argc, char **argv)
         static struct option long_options[] = {
             {"help",        no_argument,       0, 'h'}, /* Help */
             {"boot",        no_argument,       0, 'b'}, /* Load firmware */
+            {"gain",        required_argument, 0, 'g'}, /* Capture an image from the camera */
             {"capture",     required_argument, 0, 'c'}, /* Capture an image from the camera */
             {0, 0, 0, 0}
         };
         
         int option_index = 0;
-        c = getopt_long(argc, argv, "hbc:", long_options, &option_index);
+        c = getopt_long(argc, argv, "hbc:g:", long_options, &option_index);
 
         if (c == 'h' || c == -1) {
             usage();
@@ -70,7 +71,8 @@ int main(int argc, char **argv)
                 Image *image = NULL;
                 ImageInfo *image_info = CloneImageInfo((ImageInfo *)NULL);
                 MagickCoreGenesis(NULL, MagickTrue);
-                image = ConstituteImage(raw->width, raw->height, "I", CharPixel, raw->data, NULL);
+                ExceptionInfo *exception = AcquireExceptionInfo();
+                image = ConstituteImage(raw->width, raw->height, "I", CharPixel, raw->data, exception);
                 strcpy(image->filename, "image.jpg");
                 WriteImage(image_info, image);
                 MagickCoreTerminus();

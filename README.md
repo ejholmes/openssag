@@ -1,7 +1,7 @@
 OpenSSAG
 ============
 This is an open source driver for the [Orion StarShoot
-Autoguider](http://www.telescope.com/Astrophotography/Astrophotography-Cameras/Orion-StarShoot-AutoGuider/pc/-1/c/4/sc/58/p/52064.uts) for use on Linux and Mac OS X.
+Autoguider](http://www.telescope.com/Astrophotography/Astrophotography-Cameras/Orion-StarShoot-AutoGuider/pc/-1/c/4/sc/58/p/52064.uts) for use on Linux and Mac OS X. The library also comes with a command line tool called openssag, that you can use as a reference for implementing OpenSSAG in your application.
 
 Compiling From Source
 ---------------------
@@ -16,7 +16,7 @@ $ make install
 ```
 
 **Mac OS X**  
-Requires Developer Tools/Xcode
+Requires Developer Tools/Xcode. You made need to specify the location of libusb, like so:
 
 ```
 $ ./configure --prefix=/usr LIBUSB_CFLAGS="<location of usb.h>" LIBUSB_LIBS"<location of libusb.a>"
