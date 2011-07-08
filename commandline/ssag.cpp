@@ -7,6 +7,10 @@
 
 #include "openssag.h"
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif // HAVE_CONFIG_H
+
 using namespace OpenSSAG;
 
 void usage()
@@ -68,6 +72,7 @@ int main(int argc, char **argv)
             int duration = 1000;
             struct raw_image *raw = camera->Expose(duration);
             if (raw) {
+#ifdef HAVE_LIBMAGICKCORE
                 Image *image = NULL;
                 ImageInfo *image_info = CloneImageInfo((ImageInfo *)NULL);
                 MagickCoreGenesis(NULL, MagickTrue);
@@ -76,6 +81,13 @@ int main(int argc, char **argv)
                 strcpy(image->filename, "image.jpg");
                 WriteImage(image_info, image);
                 MagickCoreTerminus();
+#else
+                FILE *fd = fopen("image.8bit", "w");
+                if (fd) {
+                    fwrite(raw->data, 1, raw->width * raw->height, fd);
+                    fclose(fd);
+                }
+#endif // HAVE_LIBMAGICKCORE
             }
             goto done;
         }

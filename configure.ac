@@ -16,12 +16,12 @@ AC_PROG_LIBTOOL
 AC_CHECK_LIB([usb], [usb_control_msg])
 
 # Check for libusb
-PKG_CHECK_MODULES([LIBUSB], [libusb],,[
-                   AC_CHECK_LIB([usb], [usb_init],,[AC_MSG_ERROR[libusb not found]])
-                   AC_CHECK_HEADERS([usb.h],,[AC_MSG_ERROR[usb.h not found]])
-                   ])
+PKG_CHECK_MODULES([LIBUSB], [libusb],,)
+AC_CHECK_HEADERS([usb.h],,[AC_MSG_ERROR[usb.h not found]])
+AC_CHECK_LIB([usb], [usb_init],,[AC_MSG_ERROR[libusb not found]])
 
-PKG_CHECK_MODULES([IMAGEMAGICK], [MagickCore])
+PKG_CHECK_MODULES([MAGICKCORE], [MagickCore],,)
+AC_CHECK_LIB([MagickCore], [ConstituteImage],,)
 
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h string.h])
