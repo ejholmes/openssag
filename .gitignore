@@ -6,6 +6,9 @@
 *.exe
 *.hex
 *.bin
+*.xcodeproj
+
+build
 
 # http://www.gnu.org/software/automake
 

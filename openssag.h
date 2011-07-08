@@ -11,8 +11,10 @@
 
 typedef struct usb_dev_handle usb_dev_handle;
 
+#ifdef __cplusplus
 namespace OpenSSAG
 {
+#endif
     /* Struct used to return image data */
     struct raw_image {
         unsigned int width;
@@ -27,7 +29,7 @@ namespace OpenSSAG
         guide_north = 0x40,
         guide_west  = 0x80,
     };
-
+#ifdef __cplusplus
     class SSAG
     {
     private:
@@ -106,5 +108,6 @@ namespace OpenSSAG
         void LoadFirmware();
     };
 }
+#endif // __cplusplus
  
 #endif /* __OPEN_SSAG_H__ */ 
