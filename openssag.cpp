@@ -79,7 +79,8 @@ void SSAG::Disconnect()
 struct raw_image *SSAG::Expose(int duration)
 {
     this->InitSequence();
-    usb_control_msg(this->handle, 0xc0, USB_RQ_EXPOSE, duration, 0, NULL, 2, 5000);
+    char data[16];
+    usb_control_msg(this->handle, 0xc0, USB_RQ_EXPOSE, duration, 0, data, 2, 5000);
 
     struct raw_image *image = (raw_image *)malloc(sizeof(struct raw_image));
     image->width = IMAGE_WIDTH;
