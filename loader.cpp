@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,8 +17,6 @@
 #include "firmware.h"
 
 #define CPUCS_ADDRESS 0xe600
-
-#define CHUNK_SIZE 0x10
 
 enum USB_REQUEST {
     USB_RQ_LOAD_FIRMWARE = 0xa0,
