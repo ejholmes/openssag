@@ -24,12 +24,6 @@ $ make
 $ make install
 ```
 
-Or, if you prefer Xcode:
-
-```
-$ open OpenSSAG.xcodeproj
-```
-
 Usage
 -----
 The following shows a simple example of how to use the library in a C++ application.  
