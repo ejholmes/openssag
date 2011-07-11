@@ -12,8 +12,8 @@
 #define sleep(n) Sleep(1000 * n)
 #endif
 
-#include "util.h"
 #include "openssag.h"
+#include "openssag_priv.h"
 
 enum USB_REQUEST {
     USB_RQ_GUIDE = 16, /* 0x10 */

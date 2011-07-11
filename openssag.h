@@ -39,7 +39,7 @@ namespace OpenSSAG
         /* Sends init packet and pre expose request */
         void InitSequence();
 
-        /* Gets the data from the autoguiders internal buffer */
+        /* Gets the data from the autoguider's internal buffer */
         unsigned char *ReadBuffer(int timeout);
 
         /* Holds the converted gain */

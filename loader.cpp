@@ -12,8 +12,8 @@
 #define sleep(n) Sleep(1000 * n)
 #endif
 
-#include "util.h"
 #include "openssag.h"
+#include "openssag_priv.h"
 #include "firmware.h"
 
 #define CPUCS_ADDRESS 0xe600
