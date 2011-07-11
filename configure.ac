@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.68])
 AC_INIT([OpenSSAG], [0.1], [eric@ejholmes.net])
-AC_CONFIG_SRCDIR([util.h])
+AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 
@@ -51,5 +51,5 @@ AC_C_INLINE
 # Checks for library functions.
 AC_FUNC_MALLOC
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT

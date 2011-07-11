@@ -13,8 +13,12 @@
 #endif
 
 #include "openssag.h"
-#include "util.h"
 
+#if DEBUG
+#define DBG(...) fprintf(stderr, __VA_ARGS__)
+#else
+#define DBG(...)
+#endif
 
 using namespace OpenSSAG;
 
