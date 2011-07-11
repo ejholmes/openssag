@@ -10,7 +10,7 @@ Download the most recent source package from the [downloads section](https://git
 **Linux**
 
 ```
-$ ./configure --prefix=/usr
+$ ./configure
 $ make
 $ make install
 ```
@@ -19,7 +19,7 @@ $ make install
 Requires Developer Tools/Xcode. You made need to specify the location of libusb, like so:
 
 ```
-$ ./configure --prefix=/usr LIBUSB_CFLAGS="<location of usb.h>" LIBUSB_LIBS"<location of libusb.a>"
+$ ./configure LIBUSB_CFLAGS="<location of usb.h>" LIBUSB_LIBS"<location of libusb.a>"
 $ make
 $ make install
 ```
