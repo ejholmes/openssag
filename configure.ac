@@ -5,7 +5,9 @@ AC_PREREQ([2.68])
 AC_INIT([OpenSSAG], [0.1], [eric@ejholmes.net])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
+AC_PREFIX_DEFAULT([/usr])
 
 # Checks for programs.
 AC_PROG_CXX
