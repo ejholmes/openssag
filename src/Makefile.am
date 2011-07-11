@@ -1,5 +1,6 @@
 lib_LTLIBRARIES = libopenssag.la
 noinst_PROGRAMS = openssag
+
 libopenssag_la_CPPFLAGS = $(LIBUSB_CFLAGS)
 libopenssag_la_LIBADD = $(LIBUSB_LIBS)
 libopenssag_la_SOURCES = openssag.cpp loader.cpp

@@ -13,17 +13,25 @@ AC_PROG_CC
 AC_PROG_LIBTOOL
 PKG_PROG_PKG_CONFIG
 
+AC_ARG_WITH(magick,
+            AS_HELP_STRING([--with-magick], [Convert resulting image from raw values to image format with MagickCore]),
+            [if test x$with_magick == xyes; then
+                if test ! -z $PKG_CONFIG; then
+                    PKG_CHECK_MODULES([MAGICKCORE], [MagickCore], AC_CHECK_LIB([MagickCore], [ConstituteImage],,),)
+                fi
+             fi])
+
 AC_ARG_ENABLE(debug,
-              [  --enable-debug          Enable debugging (disabled by default)],
+              AS_HELP_STRING([--enable-debug], [Enable debugging (disabled by default)]),
               [if test x$enableval = xyes; then
                    AC_DEFINE(DEBUG, 1, [Define this to enable debug messages and assert warnings.]) debug_support=yes
                fi])
 
+# Check for libusb
 AC_PATH_PROG([LIBUSB_CONFIG], [libusb-config], [], [$PATH$PATH_SEPARATOR/usr/local/Crosspack-AVR/bin])
 
 if test ! -z $PKG_CONFIG; then
     PKG_CHECK_MODULES([LIBUSB], [libusb],,)
-    PKG_CHECK_MODULES([MAGICKCORE], [MagickCore], AC_CHECK_LIB([MagickCore], [ConstituteImage],,),)
 else
     if test ! -z $LIBUSB_CONFIG; then
         LIBUSB_CFLAGS=`$LIBUSB_CONFIG --cflags`
