@@ -35,7 +35,7 @@
 #include "phd.h"
 #include "camera.h"
 #include "image_math.h"
-#include "cam_template.h"
+#include "cam_openssag.h"
 
 #include "openssag.h"
 
