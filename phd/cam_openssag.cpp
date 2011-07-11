@@ -42,76 +42,73 @@
 using namespace OpenSSAG;
 
 Camera_OpenSSAGClass::Camera_OpenSSAGClass() {
-	Connected = FALSE;
-	Name=_T("StarShoot Autoguider (OpenSSAG)");
-	FullSize = wxSize(1280,1024);  // Current size of a full frame
-	HasGuiderOutput = true;  // Do we have an ST4 port?
-	HasGainControl = true;  // Can we adjust gain?
+    Connected = FALSE;
+    Name=_T("StarShoot Autoguider (OpenSSAG)");
+    FullSize = wxSize(1280,1024);  // Current size of a full frame
+    HasGuiderOutput = true;  // Do we have an ST4 port?
+    HasGainControl = true;  // Can we adjust gain?
 
     ssag = new SSAG();
 }
 
-
-
 bool Camera_OpenSSAGClass::Connect() {
-	if (frame->mount_menu->IsChecked(MOUNT_CAMERA)) {  // User wants to use an onboard guide port - connect.  (Should be smarter - does cam have one?)
-		ScopeConnected = MOUNT_CAMERA;
-		frame->SetStatusText(_T("Scope"),4);
-	}
+    if (frame->mount_menu->IsChecked(MOUNT_CAMERA)) {
+        ScopeConnected = MOUNT_CAMERA;
+        frame->SetStatusText(_T("Scope"),4);
+    }
 
-	if (!ssag->Connect()) {  // If connection failed, pop up dialog and return true
-		wxMessageBox(_T("Could not connect to StarShoot Autoguider"));
-		return true;
-	}
+    if (!ssag->Connect()) {
+        wxMessageBox(_T("Could not connect to StarShoot Autoguider"));
+        return true;
+    }
 
-	Connected = true;  // Set global flag for being connected
+    Connected = true;  // Set global flag for being connected
 
-	return false;
+    return false;
 }
 
 bool Camera_OpenSSAGClass::PulseGuideScope(int direction, int duration) {
-	switch (direction) {
-		case WEST:
+    switch (direction) {
+        case WEST:
             ssag->Guide(guide_west, duration);
             break;
-		case NORTH:
+        case NORTH:
             ssag->Guide(guide_north, duration);
             break;
-		case SOUTH:
+        case SOUTH:
             ssag->Guide(guide_south, duration);
             break;
-		case EAST:
+        case EAST:
             ssag->Guide(guide_east, duration);
             break;
-		default: return true; // bad direction passed in
-	}
+        default: return true; // bad direction passed in
+    }
 
-	return false;
+    return false;
 }
 
 bool Camera_OpenSSAGClass::Disconnect() {
 
-	Connected = false;
-	CurrentGuideCamera = NULL;
-	GuideCameraConnected = false;
+    Connected = false;
+    CurrentGuideCamera = NULL;
+    GuideCameraConnected = false;
     ssag->Disconnect();
-	return false;
+    return false;
 }
 
 bool Camera_OpenSSAGClass::CaptureFull(int duration, usImage& img, bool recon) {
-	int xsize = FullSize.GetWidth();
-	int ysize = FullSize.GetHeight();
+    int xsize = FullSize.GetWidth();
+    int ysize = FullSize.GetHeight();
 
-	if (img.Init(xsize,ysize)) {
- 		wxMessageBox(_T("Memory allocation error during capture"),wxT("Error"),wxOK | wxICON_ERROR);
-		Disconnect();
-		return true;
-	}
+    if (img.Init(xsize,ysize)) {
+        wxMessageBox(_T("Memory allocation error during capture"),wxT("Error"),wxOK | wxICON_ERROR);
+        Disconnect();
+        return true;
+    }
 
     img.ImageData = ssag->Expose(duration);
 
-	if (HaveDark && recon) Subtract(img,CurrentDarkFrame);
+    if (HaveDark && recon) Subtract(img,CurrentDarkFrame);
 
-	return false;
+    return false;
 }
-
