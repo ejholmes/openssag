@@ -77,18 +77,18 @@ void Loader::LoadFirmware()
     /* Load bootloader */
     this->EnterResetMode();
     this->EnterResetMode();
-    printf("Loading bootloader...");
+    DBG("Loading bootloader...");
     this->Upload(bootloader);
-    printf("done\n");
+    DBG("done\n");
     this->ExitResetMode(); /* Transfer execution to the reset vector */
 
     sleep(1); /* Wait for renumeration */
 
     /* Load firmware */
     this->EnterResetMode();
-    printf("Loading firmware...");
+    DBG("Loading firmware...");
     this->Upload(firmware);
-    printf("done\n");
+    DBG("done\n");
     this->EnterResetMode(); /* Make sure the CPU is in reset */
     this->ExitResetMode(); /* Transfer execution to the reset vector */
 }

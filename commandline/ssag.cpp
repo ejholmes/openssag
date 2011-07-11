@@ -8,11 +8,12 @@
 #include <unistd.h>
 #include <getopt.h>
 
-#if HAVE_LIBMAGICKCORE == 1
+#if HAVE_LIBMAGICKCORE
 #include <magick/MagickCore.h>
 #endif
 
 #include "openssag.h"
+#include "util.h"
 
 
 using namespace OpenSSAG;
@@ -23,7 +24,7 @@ void usage()
     printf("Capture images from an Orion StarShoot Autoguider.\n\n");
     
     printf("  -c, --capture [DURATION]             Capture an image from the camera. DURATION is the exposure time in ms.\n");
-#if HAVE_LIBMAGICKCORE == 1
+#if HAVE_LIBMAGICKCORE
     printf("  -f, --filename [FILENAME]            Specifiy the filename to save the image as. (eg. M42.png, M32.jpg)\n");
 #endif
     printf("  -g, --gain [1-15]                    Set the gain to be used for the capture. Only accepts values between 1 and 15\n");
@@ -32,11 +33,15 @@ void usage()
 
 int main(int argc, char **argv)
 {
+    if (argc <= 1) {
+        usage();
+        return 0;
+    }
     SSAG *camera = new SSAG();
     static int capture_flag, gain_flag;
     static int duration = 1000;
     static int gain = 4;
-#if HAVE_LIBMAGICKCORE == 1
+#if HAVE_LIBMAGICKCORE
     static char filename[256] = "image.png";
 #endif
     int c;
@@ -48,7 +53,7 @@ int main(int argc, char **argv)
             {"boot",        no_argument,       0, 'b'}, /* Load firmware */
             {"gain",        required_argument, &gain_flag, 'g'}, /* Capture an image from the camera */
             {"capture",     required_argument, &capture_flag, 'c'}, /* Capture an image from the camera */
-#if HAVE_LIBMAGICKCORE == 1
+#if HAVE_LIBMAGICKCORE
             {"filename",    required_argument, 0, 'f'},
 #endif
             {0, 0, 0, 0}
@@ -89,7 +94,7 @@ int main(int argc, char **argv)
                 duration = atoi(optarg);
                 capture_flag = 1;
                 break;
-#if HAVE_LIBMAGICKCORE == 1
+#if HAVE_LIBMAGICKCORE
             case 'f':
                 strcpy(filename, optarg);
                 break;
@@ -109,7 +114,7 @@ int main(int argc, char **argv)
         }
         struct raw_image *raw = camera->Expose(duration);
         if (raw) {
-#if HAVE_LIBMAGICKCORE == 1
+#if HAVE_LIBMAGICKCORE
             Image *image = NULL;
             ImageInfo *image_info = CloneImageInfo((ImageInfo *)NULL);
             image_info->compression = NoCompression;

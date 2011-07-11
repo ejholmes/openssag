@@ -80,6 +80,11 @@ void SSAG::Disconnect()
     this->handle = NULL;
 }
 
+bool SSAG::IsConnected()
+{
+    return (this->handle != NULL);
+}
+
 struct raw_image *SSAG::Expose(int duration)
 {
     this->InitSequence();

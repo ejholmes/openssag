@@ -1,6 +1,10 @@
 #ifndef __UTIL_H__
 #define __UTIL_H___ 
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <usb.h>
 
 /* Opens a usb_dev_handle based on the vendor id and product id */
@@ -49,5 +53,11 @@ havedevice:
     *device = handle;
     return 1;
 }
+
+#if DEBUG
+#define DBG(...) fprintf(stderr, __VA_ARGS__)
+#else
+#define DBG(...)
+#endif
 
 #endif /* __UTIL_H___ */

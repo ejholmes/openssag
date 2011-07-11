@@ -60,6 +60,9 @@ namespace OpenSSAG
         /* Disconnect from the autoguider */
         void Disconnect();
 
+        /* Returns true if the device is currently connected. */
+        bool IsConnected();
+
         /* Gain should be a value between 1 and 15 */
         void SetGain(int gain);
 
