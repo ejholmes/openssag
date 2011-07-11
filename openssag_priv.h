@@ -1,5 +1,5 @@
-#ifndef __UTIL_H__
-#define __UTIL_H___ 
+#ifndef __OPENSSAG_PRIV_H_
+#define __OPENSSAG_PRIV_H_ 
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -60,4 +60,4 @@ havedevice:
 #define DBG(...)
 #endif
 
-#endif /* __UTIL_H___ */
+#endif /* __OPENSSAG_PRIV_H_ */
