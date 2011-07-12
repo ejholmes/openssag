@@ -33,7 +33,7 @@ AC_ARG_ENABLE(debug,
 AC_PATH_PROG([LIBUSB_CONFIG], [libusb-config], [], [$PATH$PATH_SEPARATOR/usr/local/Crosspack-AVR/bin])
 
 if test ! -z $PKG_CONFIG; then
-    PKG_CHECK_MODULES([LIBUSB], [libusb],,)
+    PKG_CHECK_MODULES([LIBUSB], [libusb],,[PKG_CHECK_MODULES([LIBUSB], [libusb-legacy],,)])
 else
     if test ! -z $LIBUSB_CONFIG; then
         LIBUSB_CFLAGS=`$LIBUSB_CONFIG --cflags`
