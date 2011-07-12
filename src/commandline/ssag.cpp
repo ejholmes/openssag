@@ -33,6 +33,8 @@ void usage()
 #endif
     printf("  -g, --gain [1-15]                    Set the gain to be used for the capture. Only accepts values between 1 and 15\n");
     printf("  -b, --boot                           Load the firmware onto the camera.\n");
+    printf("  -p, --pulseguide [nswe]              Pulseguide in direction.\n");
+    printf("  -d, --duration [DURATION]            Duration to pulseguide in milliseconds\n");
 }
 
 int main(int argc, char **argv)
@@ -42,9 +44,11 @@ int main(int argc, char **argv)
         return 0;
     }
     SSAG *camera = new SSAG();
-    static int capture_flag, gain_flag;
+    static int capture_flag, gain_flag, pulseguide_flag;
     static int duration = 1000;
     static int gain = 4;
+    static int pulseguide_duration = 100;
+    static int pulseguide_direction = guide_north;
 #if HAVE_LIBMAGICKCORE
     static char filename[256] = "image.png";
 #endif
@@ -60,11 +64,13 @@ int main(int argc, char **argv)
 #if HAVE_LIBMAGICKCORE
             {"filename",    required_argument, 0, 'f'},
 #endif
+            {"pulseguide",  required_argument, &pulseguide_flag, 'p'},
+            {"duration",    required_argument, 0, 'd'},
             {0, 0, 0, 0}
         };
         
         int option_index = 0;
-        c = getopt_long(argc, argv, "hbc:g:f:", long_options, &option_index);
+        c = getopt_long(argc, argv, "hbc:g:f:p:d:", long_options, &option_index);
 
         if (c == -1) {
             break;
@@ -97,6 +103,24 @@ int main(int argc, char **argv)
             case 'c':
                 duration = atoi(optarg);
                 capture_flag = 1;
+                break;
+            case 'd':
+                pulseguide_duration = atoi(optarg);
+                break;
+            case 'p':
+                if (strcmp(optarg, "n") == 0) {
+                    pulseguide_direction = guide_north;
+                } else if (strcmp(optarg, "s") == 0) {
+                    pulseguide_direction = guide_south;
+                } else if (strcmp(optarg, "e") == 0) {
+                    pulseguide_direction = guide_east;
+                } else if (strcmp(optarg, "w") == 0) {
+                    pulseguide_direction = guide_west;
+                } else {
+                    usage();
+                    exit(-1);
+                }
+                pulseguide_flag = 1;
                 break;
 #if HAVE_LIBMAGICKCORE
             case 'f':
@@ -138,6 +162,16 @@ int main(int argc, char **argv)
             }
 #endif // HAVE_LIBMAGICKCORE
         }
+    }
+
+    if (pulseguide_flag) {
+        if (!camera->IsConnected()) {
+            if (!camera->Connect()) {
+                fprintf(stderr, "Camera not found or could not connect\n");
+                goto done;
+            }
+        }
+        camera->Guide(pulseguide_direction, pulseguide_duration);
     }
 done:
     if (camera)
