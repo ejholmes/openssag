@@ -1,9 +1,6 @@
 #ifndef __OPEN_SSAG_H__ 
 #define __OPEN_SSAG_H__ 
 
-#define OPENSSAG_VER 0x01, 0x00 /* Minor, Major */
-
-
 #define VENDOR_ID 0x1856 /* Orion Telescopes VID */
 #define PRODUCT_ID 0x0012 /* SSAG IO PID */
 
