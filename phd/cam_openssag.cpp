@@ -37,7 +37,7 @@
 #include "image_math.h"
 #include "cam_openssag.h"
 
-#include "openssag.h"
+#include <openssag.h>
 
 using namespace OpenSSAG;
 
@@ -88,7 +88,6 @@ bool Camera_OpenSSAGClass::PulseGuideScope(int direction, int duration) {
 }
 
 bool Camera_OpenSSAGClass::Disconnect() {
-
     Connected = false;
     CurrentGuideCamera = NULL;
     GuideCameraConnected = false;
@@ -106,7 +105,14 @@ bool Camera_OpenSSAGClass::CaptureFull(int duration, usImage& img, bool recon) {
         return true;
     }
 
-    img.ImageData = ssag->Expose(duration);
+    ssag->SetGain((int)(GuideCameraGain / 24));
+    struct raw_image *raw = ssag->Expose(duration);
+
+    for (unsigned int i = 0; i < raw->width * raw->height; i++) {
+        img.ImageData[i] = (int)raw->data[i];
+    }
+
+    ssag->FreeRawImage(raw);
 
     if (HaveDark && recon) Subtract(img,CurrentDarkFrame);
 
