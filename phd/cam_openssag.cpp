@@ -1,5 +1,5 @@
 /*
- *  cam_template.cpp
+ *  cam_openssag.cpp
  *  PHD Guiding
  *
  *  Created by Craig Stark.
