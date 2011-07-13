@@ -16,9 +16,18 @@ $ make install
 ```
 
 **Mac OS X**  
-Requires Developer Tools/Xcode.
+Requires Developer Tools/Xcode. You may need to specifiy the location of libusb, like so:
 
 ```
+$ ./configure LIBUSB_CFLAGS="<libusb cflags>" LIBUSB_LIBS="<libusb libs>"
+$ make
+$ make install
+```
+
+Or, just install [MacPorts](http://www.macports.org/) and run:
+
+```
+$ port install pkgconfig libusb-legacy
 $ ./configure
 $ make
 $ make install
