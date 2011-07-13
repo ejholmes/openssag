@@ -29,32 +29,41 @@ AC_ARG_ENABLE(debug,
                    AC_DEFINE(DEBUG, 1, [Define this to enable debug messages and assert warnings.]) debug_support=yes
                fi])
 
-AC_ARG_WITH(tool,
-            AS_HELP_STRING([--with-tool], [Also compile commandline tool (Disabled by default)]),
-            [if test x$with_tool == xyes; then
-                # Check for libusb
-                AC_PATH_PROG([LIBUSB_CONFIG], [libusb-config], [], [$PATH$PATH_SEPARATOR/usr/local/Crosspack-AVR/bin])
+# Check for libusb
+AC_PATH_PROG([LIBUSB_CONFIG], [libusb-config], [], [$PATH$PATH_SEPARATOR/usr/local/Crosspack-AVR/bin])
 
-                if test ! -z $PKG_CONFIG; then
-                    PKG_CHECK_MODULES([LIBUSB], [libusb],,[PKG_CHECK_MODULES([LIBUSB], [libusb-legacy],,)])
-                else
-                    if test ! -z $LIBUSB_CONFIG; then
-                        LIBUSB_CFLAGS=`$LIBUSB_CONFIG --cflags`
-                        LIBUSB_LIBS=`$LIBUSB_CONFIG --libs`
-                        AC_SUBST([LIBUSB_CFLAGS])
-                        AC_SUBST([LIBUSB_LIBS])
-                    else
-                        AC_MSG_ERROR([
-                * No suitable version of libusb-0.1 was found.
-                * If you know where libusb is located, specify it
-                * with the LIBUSB_CFLAGS and LIBUSB_LIBS variables.
-                *
-                * If you do not have libusb installed, you can
-                * download it from http://www.libusb.org/])
-                    fi
-                fi
-             fi])
+if test ! -z $PKG_CONFIG; then
+    PKG_CHECK_MODULES([LIBUSB], [libusb],,[PKG_CHECK_MODULES([LIBUSB], [libusb-legacy],,)])
+else
+    if test ! -z $LIBUSB_CONFIG; then
+        LIBUSB_CFLAGS=`$LIBUSB_CONFIG --cflags`
+        LIBUSB_LIBS=`$LIBUSB_CONFIG --libs`
+        AC_SUBST([LIBUSB_CFLAGS])
+        AC_SUBST([LIBUSB_LIBS])
+    else
+        have_libusb=yes
+        AC_CHECK_HEADER([usb.h],, [have_libusb=no])
+        AC_CHECK_LIB([usb], [usb_init],, [have_libusb=no])
+
+        if test x$have_libusb == xno; then
+            AC_MSG_WARN([
+* No suitable version of libusb-0.1 was found.
+* If you know where libusb is located, specify it
+* with the LIBUSB_CFLAGS and LIBUSB_LIBS variables.
+*
+* If you do not have libusb installed, you can
+* download it from http://www.libusb.org/])
+        else
+            LIBUSB_LIBS="-lusb"
+        fi
+    fi
+fi
+
+AC_ARG_WITH(tool,
+            AS_HELP_STRING([--with-tool], [Also compile commandline tool (Disabled by default)]))
+
 AM_CONDITIONAL(ENABLE_TOOL, test x$with_tool == xyes)
+AM_CONDITIONAL(SHARED, test x$enable_shared == xyes)
 
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h string.h])
