@@ -96,7 +96,7 @@ namespace OpenSSAG
         void ExitResetMode();
 
         /* Sends firmware to the device */
-        void Upload(unsigned char *data);
+        bool Upload(unsigned char *data);
 
         /* Handle to the cypress device */
         usb_dev_handle *handle;
@@ -108,12 +108,12 @@ namespace OpenSSAG
         void Disconnect();
 
         /* Loads the firmware into SSAG's RAM */
-        void LoadFirmware();
+        bool LoadFirmware();
 
         /* Loads the SSAG eeprom onto the camera. You shouldn't use this if you
          * don't know what you're doing.
          * See http://www.cypress.com/?id=4&rID=34127 for more information. */
-        void LoadEEPROM();
+        bool LoadEEPROM();
     };
 }
 #endif // __cplusplus

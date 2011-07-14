@@ -18,6 +18,7 @@
 
 #define CPUCS_ADDRESS 0xe600
 
+/* USB commands to control device */
 enum USB_REQUEST {
     USB_RQ_LOAD_FIRMWARE = 0xa0,
     USB_RQ_WRITE_SMALL_EEPROM = 0xa2
@@ -25,8 +26,11 @@ enum USB_REQUEST {
 
 using namespace OpenSSAG;
 
+/* Bootloader data */
 static unsigned char bootloader[] = { SSAG_BOOTLOADER };
+/* Firmware data */
 static unsigned char firmware[] = { SSAG_FIRMWARE };
+/* EEPROM data (shouldn't be needed) */
 static unsigned char eeprom[] = { SSAG_EEPROM };
 
 bool Loader::Connect()
@@ -58,19 +62,24 @@ void Loader::ExitResetMode()
     usb_control_msg(this->handle, 0x40, USB_RQ_LOAD_FIRMWARE, CPUCS_ADDRESS, 0, &data, 1, 5000);
 }
 
-void Loader::Upload(unsigned char *data)
+bool Loader::Upload(unsigned char *data)
 {
     for (;;) {
         unsigned char byte_count = *data;
         if (byte_count == 0)
             break;
         unsigned short address = *(unsigned int *)(data+1);
-        usb_control_msg(this->handle, 0x40, USB_RQ_LOAD_FIRMWARE, address, 0, (char *)(data+3), byte_count, 5000);
+        int received = 0;
+        if ((received = usb_control_msg(this->handle, 0x40, USB_RQ_LOAD_FIRMWARE, address, 0, (char *)(data+3), byte_count, 5000)) != byte_count) {
+            DBG("ERROR:  Tried to send %d bytes of data but device reported back with %d\n", byte_count, received);
+            return false;
+        }
         data += byte_count + 3;
     }
+    return true;
 }
 
-void Loader::LoadFirmware()
+bool Loader::LoadFirmware()
 {
     unsigned char *data = NULL;
 
@@ -78,7 +87,8 @@ void Loader::LoadFirmware()
     this->EnterResetMode();
     this->EnterResetMode();
     DBG("Loading bootloader...");
-    this->Upload(bootloader);
+    if (!this->Upload(bootloader))
+        return false;
     DBG("done\n");
     this->ExitResetMode(); /* Transfer execution to the reset vector */
 
@@ -87,15 +97,20 @@ void Loader::LoadFirmware()
     /* Load firmware */
     this->EnterResetMode();
     DBG("Loading firmware...");
-    this->Upload(firmware);
+    if (!this->Upload(firmware))
+        return false;
     DBG("done\n");
     this->EnterResetMode(); /* Make sure the CPU is in reset */
     this->ExitResetMode(); /* Transfer execution to the reset vector */
+
+    return true;
 }
 
-void Loader::LoadEEPROM()
+bool Loader::LoadEEPROM()
 {
     size_t length = *eeprom;
     char *data = (char *)(eeprom+3);
     usb_control_msg(this->handle, 0x40, USB_RQ_WRITE_SMALL_EEPROM, 0x00, 0xBEEF, data, length, 5000);
+
+    return true;
 }

@@ -15,29 +15,36 @@
 #include "openssag.h"
 #include "openssag_priv.h"
 
+/* USB commands to control the camera */
 enum USB_REQUEST {
     USB_RQ_GUIDE = 16, /* 0x10 */
     USB_RQ_EXPOSE = 18, /* 0x12 */
     USB_RQ_SET_INIT_PACKET = 19, /* 0x13 */
     USB_RQ_PRE_EXPOSE = 20, /* 0x14 */
+
+    /* These aren't tested yet */
     USB_RQ_CANCEL_GUIDE = 24, /* 0x18 */
     USB_RQ_CANCEL_GUIDE_NORTH_SOUTH = 34, /* 0x22 */
     USB_RQ_CANCEL_GUIDE_EAST_WEST = 33 /* 0x21 */
 };
 
+/* USB Bulk endpoint to grab data from */
 #define BUFFER_ENDPOINT 2
 
+/* Amount of data returned from camera */
 #define BUFFER_SIZE 1600200
 #define BUFFER_ROW_LENGTH 1524
 
+/* Image size */
 #define IMAGE_WIDTH 1280
 #define IMAGE_HEIGHT 1024
 
+/* Number of pixel columns/rows to skip */
 #define ROW_START 12
 #define COLUMN_START 20
 
+/* Hell if I know */
 #define SHUTTER_WIDTH 1049
-
 #define PIXEL_OFFSET 12440
 
 using namespace OpenSSAG;
@@ -53,7 +60,10 @@ bool SSAG::Connect(bool bootload)
         if (bootload) {
             Loader *loader = new Loader();
             if (loader->Connect()) {
-                loader->LoadFirmware();
+                if (!loader->LoadFirmware()) {
+                    fprintf(stderr, "ERROR:  Failed to upload firmware to the device\n");
+                    return false;
+                }
                 loader->Disconnect();
                 sleep(2);
                 return this->Connect(false);
