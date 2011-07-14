@@ -1,4 +1,4 @@
-SUBDIRS = src
+SUBDIRS = src src/commandline
 
 EXTRA_DIST = autogen.sh LICENSE.txt README.md
 ACLOCAL_AMFLAGS = -I m4
