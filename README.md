@@ -73,24 +73,26 @@ Technical Information
 
 The Orion StarShoot Autoguider uses an MT9M001 CMOS sensor from Aptina Imaging (Micron) and is controlled through a Cypress FX2 High Speed USB Controller.
 
-**Firmware**
+**Firmware**  
+
 The Cypress FX2 does not contain any flash program space where firmware can be loaded, but depends on the firmware being loaded into RAM over USB when the device is connected to the host operating system. The Windows driver automatically handles this when the device is connected via ssagload.sys. Since Mac and Linux don't have functionality similar to this, the firmware is loaded when SSAG::Connect() is called.
 
 The firmware includes two sections; a second stage loader that sets up the environment in the FX2, and the real firmware that controls the camera. The firmware hex files can be found in the `firmware` directory. The firmware was extracted from the device by sniffing USB traffic. For more information on how the FX2 handles firmware, see the [FX2 datasheet](http://www.keil.com/dd/docs/datashts/cypress/cy7c68xxx_ds.pdf).
 
-**Camera**
+**Camera**  
+
 There are three main functions for capturing images from the StarShoot Autoguider; configuring registers, exposing, and reading the data from the buffer. Register configuration and exposure control is handled via control trasnfers. Data is read back from the device over bulk endpoint 2.
 
 The registers that can be directly written to are:
 
-0x2B Gain (Even row, even column)
-0x2C Gain (Odd row, even column)
-0x2D Gain (Even row, odd column)
-0x2E Gain (Odd row, odd column)
-0x01 Row Start
-0x02 Column Start
-0x03 Row Size (Window Height)
-0x04 Column Size (Window Width)
-0x09 Shutter Width
+0x2B Gain (Even row, even column)  
+0x2C Gain (Odd row, even column)  
+0x2D Gain (Even row, odd column)  
+0x2E Gain (Odd row, odd column)  
+0x01 Row Start  
+0x02 Column Start  
+0x03 Row Size (Window Height)  
+0x04 Column Size (Window Width)  
+0x09 Shutter Width  
 
 For more information about these registers, see the [MT9M001 datasheet](http://download.micron.com/pdf/datasheets/imaging/mt9m001_1300_mono.pdf)
