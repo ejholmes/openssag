@@ -8,6 +8,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 AC_PREFIX_DEFAULT([/usr])
+LT_INIT
 
 # Checks for programs.
 AC_PROG_CXX
