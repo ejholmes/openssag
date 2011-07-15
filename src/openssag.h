@@ -1,13 +1,15 @@
 #ifndef __OPEN_SSAG_H__ 
 #define __OPEN_SSAG_H__ 
 
-#define VENDOR_ID 0x1856 /* Orion Telescopes VID */
-#define PRODUCT_ID 0x0012 /* SSAG IO PID */
+/* Orion Telescopes VID */
+#define VENDOR_ID 0x1856
+/* SSAG IO PID */
+#define PRODUCT_ID 0x0012
 
-// #define LOADER_VENDOR_ID 0x04b4 /* Default Cypress VID */
-// #define LOADER_PRODUCT_ID 0x8613 /* Default Cypress PID */
-#define LOADER_VENDOR_ID 0x1856 /* Orion Telescopes VID */
-#define LOADER_PRODUCT_ID 0x0011 /* Loader PID for loading firmware */
+/* Orion Telescopes VID */
+#define LOADER_VENDOR_ID 0x1856
+/* Loader PID for loading firmware */
+#define LOADER_PRODUCT_ID 0x0011
 
 typedef struct usb_dev_handle usb_dev_handle;
 
