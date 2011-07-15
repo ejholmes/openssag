@@ -7,6 +7,11 @@
 
 #include <usb.h>
 
+#ifdef __WIN32__
+#include "windows.h"
+#define sleep(n) Sleep(1000 * n)
+#endif
+
 /* Opens a usb_dev_handle based on the vendor id and product id */
 static inline int usb_open_device(usb_dev_handle **device, int vendorID, int productId, const char *serial)
 {
