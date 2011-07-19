@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <usb.h>
+#include <time.h>
 
 #include "openssag.h"
 #include "openssag_priv.h"
@@ -42,16 +43,54 @@ enum USB_REQUEST {
 #define SHUTTER_WIDTH 1049
 #define PIXEL_OFFSET 12440
 
+/* Number of seconds to wait for camera to renumerate after loading firmware */
+#define RENUMERATE_TIMEOUT 10
+
 using namespace OpenSSAG;
 
 SSAG::SSAG()
 {
+    usb_init();
     this->SetGain(6);
+}
+
+struct device_info *SSAG::EnumerateDevices()
+{
+    struct usb_bus *bus;
+    struct usb_device *dev;
+    struct usb_dev_handle *handle = NULL;
+    struct device_info *head = NULL, *last = NULL, *current = NULL;
+
+    usb_find_busses();
+    usb_find_devices();
+
+    for (bus = usb_get_busses(); bus; bus = bus->next) {
+        for (dev = bus->devices; dev; dev = dev->next) {
+            if (dev->descriptor.idVendor == SSAG_VENDOR_ID &&
+                    dev->descriptor.idProduct == SSAG_PRODUCT_ID) {
+                handle = usb_open(dev);
+                if (handle) {
+                    current = (struct device_info *)malloc(sizeof(struct device_info *));
+                    current->next = NULL;
+                    /* Copy serial */
+                    usb_get_string_simple(handle, dev->descriptor.iSerialNumber, current->serial, sizeof(current->serial));
+                    if (!head)
+                        head = current;
+                    if (last)
+                        last->next = current;
+
+                    last = current;
+                }
+            }
+        }
+    }
+
+    return head;
 }
 
 bool SSAG::Connect(bool bootload)
 {
-    if (!usb_open_device(&this->handle, VENDOR_ID, PRODUCT_ID, NULL)) {
+    if (!usb_open_device(&this->handle, SSAG_VENDOR_ID, SSAG_PRODUCT_ID, NULL)) {
         if (bootload) {
             Loader *loader = new Loader();
             if (loader->Connect()) {
@@ -60,8 +99,18 @@ bool SSAG::Connect(bool bootload)
                     return false;
                 }
                 loader->Disconnect();
-                sleep(2);
-                return this->Connect(false);
+                for (time_t t = time(NULL) + RENUMERATE_TIMEOUT; time(NULL) < t;) {
+                    DBG("Checking if camera has renumerated...");
+                    if (EnumerateDevices()) {
+                        DBG("Yes\n");
+                        return this->Connect(false);
+                    }
+                    DBG("No\n");
+                    sleep(1);
+                }
+                DBG("ERROR:  Device did not renumerate. Timed out.\n");
+                /* Timed out */
+                return false;
             } else {
                 return false;
             }

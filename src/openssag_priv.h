@@ -19,8 +19,6 @@ static inline int usb_open_device(usb_dev_handle **device, int vendorID, int pro
     struct usb_device *dev;
     struct usb_dev_handle *handle = NULL;
 
-    usb_init();
-
     usb_find_busses();
     usb_find_devices();
 

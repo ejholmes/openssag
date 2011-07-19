@@ -2,14 +2,14 @@
 #define __OPEN_SSAG_H__ 
 
 /* Orion Telescopes VID */
-#define VENDOR_ID 0x1856
+#define SSAG_VENDOR_ID 0x1856
 /* SSAG IO PID */
-#define PRODUCT_ID 0x0012
+#define SSAG_PRODUCT_ID 0x0012
 
 /* Orion Telescopes VID */
-#define LOADER_VENDOR_ID 0x1856
+#define SSAG_LOADER_VENDOR_ID 0x1856
 /* Loader PID for loading firmware */
-#define LOADER_PRODUCT_ID 0x0011
+#define SSAG_LOADER_PRODUCT_ID 0x0011
 
 typedef struct usb_dev_handle usb_dev_handle;
 
@@ -19,8 +19,11 @@ namespace OpenSSAG
 #endif
     /* Struct used to return image data */
     struct raw_image {
+        /* Image height */
         unsigned int width;
+        /* Image width */
         unsigned int height;
+        /* Pointer to the data. Length should be height * width */
         unsigned char *data;
     };
 
@@ -30,6 +33,13 @@ namespace OpenSSAG
         guide_south = 0x20,
         guide_north = 0x40,
         guide_west  = 0x80,
+    };
+
+    struct device_info {
+        /* Null terminated string consisting of the serial number */
+        char serial[256];
+        /* Next device in list */
+        struct device_info *next;
     };
 #ifdef __cplusplus
     class SSAG
@@ -49,6 +59,10 @@ namespace OpenSSAG
     public:
         /* Constructor */
         SSAG();
+
+        /* Returns a linked list of device_info for the currently connected
+         * StarShoot Autoguiders. If there are no cameras connected, returns NULL */
+        struct device_info *EnumerateDevices();
 
         /* Connect to the autoguider. If bootload is set to true and the camera
          * cannot be found, it will attempt to connect to the base device and

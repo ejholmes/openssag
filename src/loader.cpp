@@ -30,7 +30,7 @@ static unsigned char eeprom[] = { SSAG_EEPROM };
 
 bool Loader::Connect()
 {
-    if (!usb_open_device(&this->handle, LOADER_VENDOR_ID, LOADER_PRODUCT_ID, NULL)) {
+    if (!usb_open_device(&this->handle, SSAG_LOADER_VENDOR_ID, SSAG_LOADER_PRODUCT_ID, NULL)) {
         return false;
     }
     return true;
