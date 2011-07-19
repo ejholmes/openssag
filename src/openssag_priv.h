@@ -2,14 +2,14 @@
 #define __OPENSSAG_PRIV_H_ 
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#   include "config.h"
 #endif
 
 #include <usb.h>
 
 #ifdef __WIN32__
-#include "windows.h"
-#define sleep(n) Sleep(1000 * n)
+#   include "windows.h"
+#   define sleep(n) Sleep(1000 * n)
 #endif
 
 /* Opens a usb_dev_handle based on the vendor id and product id */
