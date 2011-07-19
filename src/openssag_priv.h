@@ -58,9 +58,9 @@ havedevice:
 }
 
 #if DEBUG
-#define DBG(...) fprintf(stderr, __VA_ARGS__)
+#   define DBG(...) fprintf(stderr, __VA_ARGS__)
 #else
-#define DBG(...)
+#   define DBG(...)
 #endif
 
 #endif /* __OPENSSAG_PRIV_H_ */
