@@ -45,6 +45,9 @@ namespace OpenSSAG
     class SSAG
     {
     private:
+        /* Sets buffer mode...or something like that */
+        void SetBufferMode();
+
         /* Sends init packet and pre expose request */
         void InitSequence();
 

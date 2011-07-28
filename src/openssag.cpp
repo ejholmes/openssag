@@ -45,6 +45,7 @@ enum USB_REQUEST {
     USB_RQ_EXPOSE = 18, /* 0x12 */
     USB_RQ_SET_INIT_PACKET = 19, /* 0x13 */
     USB_RQ_PRE_EXPOSE = 20, /* 0x14 */
+    USB_RQ_SET_BUFFER_MODE = 85, /* 0x55 */
 
     /* These aren't tested yet */
     USB_RQ_CANCEL_GUIDE = 24, /* 0x18 */
@@ -52,8 +53,10 @@ enum USB_REQUEST {
     USB_RQ_CANCEL_GUIDE_EAST_WEST = 33 /* 0x21 */
 };
 
+#define USB_TIMEOUT 5000
+
 /* USB Bulk endpoint to grab data from */
-#define BUFFER_ENDPOINT 2
+#define BUFFER_ENDPOINT 0x82
 
 /* Image size */
 #define IMAGE_WIDTH 1280
@@ -152,6 +155,8 @@ bool SSAG::Connect(bool bootload)
         }
     }
 
+    this->SetBufferMode();
+
     return true;
 }
 
@@ -167,6 +172,14 @@ void SSAG::Disconnect()
     this->handle = NULL;
 }
 
+void SSAG::SetBufferMode()
+{
+    char data[4];
+    usb_control_msg(this->handle, 0xc0, USB_RQ_SET_BUFFER_MODE, 0x00, 0x63, data, sizeof(data), USB_TIMEOUT);
+
+    DBG("Buffer Mode Data: %02x%02x%02x%02x\n", data[0], data[1], data[2], data[3]);
+}
+
 bool SSAG::IsConnected()
 {
     return (this->handle != NULL);
@@ -176,12 +189,12 @@ struct raw_image *SSAG::Expose(int duration)
 {
     this->InitSequence();
     char data[16];
-    usb_control_msg(this->handle, 0xc0, USB_RQ_EXPOSE, duration, 0, data, 2, 5000);
+    usb_control_msg(this->handle, 0xc0, USB_RQ_EXPOSE, duration, 0, data, 2, USB_TIMEOUT);
 
     struct raw_image *image = (raw_image *)malloc(sizeof(struct raw_image));
     image->width = IMAGE_WIDTH;
     image->height = IMAGE_HEIGHT;
-    image->data = this->ReadBuffer(duration + 5000);
+    image->data = this->ReadBuffer(duration + USB_TIMEOUT);
 
     if (!image->data)
         return NULL;
@@ -193,7 +206,7 @@ void SSAG::CancelExposure()
 {
     /* Not tested */
     char data = 0;
-    usb_bulk_read(this->handle, 0, (char *)&data, 1, 5000);
+    usb_bulk_read(this->handle, 0, (char *)&data, 1, USB_TIMEOUT);
 }
 
 void SSAG::Guide(int direction, int duration)
@@ -208,7 +221,7 @@ void SSAG::Guide(int direction, int yduration, int xduration)
     memcpy(data    , &xduration, 4);
     memcpy(data + 4, &yduration, 4);
 
-    usb_control_msg(this->handle, 0x40, USB_RQ_GUIDE, 0, (int)direction, data, sizeof(data), 5000);
+    usb_control_msg(this->handle, 0x40, USB_RQ_GUIDE, 0, (int)direction, data, sizeof(data), USB_TIMEOUT);
 }
 
 void SSAG::InitSequence()
@@ -239,12 +252,15 @@ void SSAG::InitSequence()
     int wValue = BUFFER_SIZE & 0xffff;
     int wIndex = BUFFER_SIZE  >> 16;
 
-    usb_control_msg(this->handle, 0x40, USB_RQ_SET_INIT_PACKET, wValue, wIndex, init_packet, sizeof(init_packet), 5000);
-    usb_control_msg(this->handle, 0x40, USB_RQ_PRE_EXPOSE, PIXEL_OFFSET, 0, NULL, 0, 5000);
+    usb_control_msg(this->handle, 0x40, USB_RQ_SET_INIT_PACKET, wValue, wIndex, init_packet, sizeof(init_packet), USB_TIMEOUT);
+    usb_control_msg(this->handle, 0x40, USB_RQ_PRE_EXPOSE, PIXEL_OFFSET, 0, NULL, 0, USB_TIMEOUT);
 }
 
 unsigned char *SSAG::ReadBuffer(int timeout)
 {
+    DBG("Buffer Width: %d\n", BUFFER_WIDTH);
+    DBG("Buffer Height: %d\n", BUFFER_HEIGHT);
+    DBG("Buffer Size: %d\n", BUFFER_SIZE);
     /* SSAG returns 1,600,200 total bytes of data */
     char *data = (char *)malloc(BUFFER_SIZE);
     char *dptr, *iptr;
