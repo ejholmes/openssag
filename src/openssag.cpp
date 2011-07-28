@@ -78,34 +78,36 @@ enum USB_REQUEST {
     USB_RQ_CANCEL_GUIDE_EAST_WEST = 33 /* 0x21 */
 };
 
-#define USB_TIMEOUT 5000
+#define USB_TIMEOUT         5000
 
 /* USB Bulk endpoint to grab data from */
-#define BUFFER_ENDPOINT 0x82
+#define BUFFER_ENDPOINT     0x82
 
 /* Image size */
-#define IMAGE_WIDTH 1280
-#define IMAGE_HEIGHT 1024
+#define IMAGE_WIDTH         1280
+#define IMAGE_HEIGHT        1024
 
-/* Horizontal/Vertical Blanking */
+/* Horizontal Blanking (in pixels) */
 #define HORIZONTAL_BLANKING 244
-#define VERTICAL_BLANKING 26
+/* Vertical Blanking (in rows) */
+#define VERTICAL_BLANKING   25
 
 /* Buffer size is determined by image size + horizontal/vertical blanking */
-#define BUFFER_WIDTH (IMAGE_WIDTH + HORIZONTAL_BLANKING)
-#define BUFFER_HEIGHT (IMAGE_HEIGHT + VERTICAL_BLANKING)
-#define BUFFER_SIZE (BUFFER_WIDTH * BUFFER_HEIGHT)
+#define BUFFER_WIDTH        (IMAGE_WIDTH + HORIZONTAL_BLANKING)
+#define BUFFER_HEIGHT       (IMAGE_HEIGHT + VERTICAL_BLANKING + 1)
+#define BUFFER_SIZE         (BUFFER_WIDTH * BUFFER_HEIGHT)
 
 /* Number of pixel columns/rows to skip */
-#define ROW_START 12
-#define COLUMN_START 20
+#define ROW_START           12
+#define COLUMN_START        20
 
 /* Hell if I know */
-#define SHUTTER_WIDTH 1049
-#define PIXEL_OFFSET 12440
+#define SHUTTER_WIDTH       (IMAGE_HEIGHT + VERTICAL_BLANKING)
+// #define PIXEL_OFFSET        (8 * (BUFFER_WIDTH + 31))
+#define PIXEL_OFFSET        12709
 
 /* Number of seconds to wait for camera to renumerate after loading firmware */
-#define RENUMERATE_TIMEOUT 10
+#define RENUMERATE_TIMEOUT  10
 
 using namespace OpenSSAG;
 
@@ -283,10 +285,8 @@ void SSAG::InitSequence()
 
 unsigned char *SSAG::ReadBuffer(int timeout)
 {
-    DBG("Buffer Width: %d\n", BUFFER_WIDTH);
-    DBG("Buffer Height: %d\n", BUFFER_HEIGHT);
-    DBG("Buffer Size: %d\n", BUFFER_SIZE);
-    /* SSAG returns 1,600,200 total bytes of data */
+    DBG("Pixel Offset: %d, Buffer Width: %d, Buffer Height: %d, Buffer Size: %d\n", PIXEL_OFFSET, BUFFER_WIDTH, BUFFER_HEIGHT, BUFFER_SIZE);
+
     char *data = (char *)malloc(BUFFER_SIZE);
     char *dptr, *iptr;
     
@@ -298,7 +298,8 @@ unsigned char *SSAG::ReadBuffer(int timeout)
     iptr = image;
     for (int i = 0; i < IMAGE_HEIGHT; i++) {
         memcpy(iptr, dptr, IMAGE_WIDTH);
-        dptr += BUFFER_WIDTH; /* Horizontal Blanking can be ignored */
+        /* Horizontal Blanking can be ignored */
+        dptr += BUFFER_WIDTH;
         iptr += IMAGE_WIDTH;
     }
 
