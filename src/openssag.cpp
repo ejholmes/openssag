@@ -44,14 +44,14 @@
  * +----------------------------------------------+     -
  * |  Black Rows          8                       |     |
  * |  +----------------------------------------+  |     |               -
- * |  |  Padding          4 (+1)               |  |     |               |
+ * |  |  Padding          4                    |  |     |               |
  * |  |  +----------------------------------+  |  |     |               |               -
  * |  |  | SXGA                             |  |  |     |               |               |
  * |  |  |                                  |  |  |     |               |               |
  * |  |  |                                  |  |  |     |               |               |
  * |  |  |                                  |  |  |     |               |               |
  * | 7| 4|                                  |4 |16|     | 1048 Pixels   | 1033 Pixels   | 1024 Pixels
- * |  |  |                                  |+1|  |     |               |               |
+ * |  |  |                                  |  |  |     |               |               |
  * |  |  |                                  |  |  |     |               |               |
  * |  |  |                                  |  |  |     |               |               |
  * |  |  |                                  |  |  |     |               |               |
@@ -101,10 +101,8 @@ enum USB_REQUEST {
 #define ROW_START           12
 #define COLUMN_START        20
 
-/* Hell if I know */
 #define SHUTTER_WIDTH       (IMAGE_HEIGHT + VERTICAL_BLANKING)
-// #define PIXEL_OFFSET        (8 * (BUFFER_WIDTH + 31))
-#define PIXEL_OFFSET        12709
+#define PIXEL_OFFSET        (8 * (BUFFER_WIDTH + 31))
 
 /* Number of seconds to wait for camera to renumerate after loading firmware */
 #define RENUMERATE_TIMEOUT  10
