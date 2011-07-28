@@ -11,6 +11,34 @@
 #include "openssag.h"
 #include "openssag_priv.h"
 
+/*
+ * MT9M001 Pixel Array
+ * 
+ * |-----------------1312 Pixels------------------|
+ *
+ *    |--------------1289 Pixels---------------|
+ *
+ *       |-----------1280 Pixels------------|
+ *
+ * +----------------------------------------------+     -
+ * |  Black Rows          8                       |     |
+ * |  +----------------------------------------+  |     |               -
+ * |  |  Padding          4 (+1)               |  |     |               |
+ * |  |  +----------------------------------+  |  |     |               |               -
+ * |  |  | SXGA                             |  |  |     |               |               |
+ * |  |  |                                  |  |  |     |               |               |
+ * | 7| 4|                                  |4 |16|     | 1048 Pixels   | 1033 Pixels   | 1024 Pixels
+ * |  |  |                                  |+1|  |     |               |               |
+ * |  |  |                                  |  |  |     |               |               |
+ * |  |  +----------------------------------+  |  |     |               |               -
+ * |  |                   4                    |  |     |               |
+ * |  +----------------------------------------+  |     |               -
+ * |                      7                       |     |
+ * +----------------------------------------------+     -
+ *
+ *
+ */
+
 /* USB commands to control the camera */
 enum USB_REQUEST {
     USB_RQ_GUIDE = 16, /* 0x10 */
@@ -27,13 +55,18 @@ enum USB_REQUEST {
 /* USB Bulk endpoint to grab data from */
 #define BUFFER_ENDPOINT 2
 
-/* Amount of data returned from camera */
-#define BUFFER_SIZE 1600200
-#define BUFFER_ROW_LENGTH 1524
-
 /* Image size */
 #define IMAGE_WIDTH 1280
 #define IMAGE_HEIGHT 1024
+
+/* Horizontal/Vertical Blanking */
+#define HORIZONTAL_BLANKING 244
+#define VERTICAL_BLANKING 26
+
+/* Buffer size is determined by image size + horizontal/vertical blanking */
+#define BUFFER_WIDTH (IMAGE_WIDTH + HORIZONTAL_BLANKING)
+#define BUFFER_HEIGHT (IMAGE_HEIGHT + VERTICAL_BLANKING)
+#define BUFFER_SIZE (BUFFER_WIDTH * BUFFER_HEIGHT)
 
 /* Number of pixel columns/rows to skip */
 #define ROW_START 12
@@ -188,10 +221,10 @@ void SSAG::InitSequence()
         0x00, this->gain, /* G2 Gain */
 
         /* Vertical Offset. Reg0x01 */
-        0x00, ROW_START,
+        ROW_START >> 8, ROW_START & 0xff,
 
         /* Horizontal Offset. Reg0x02 */
-        0x00, COLUMN_START,
+        COLUMN_START >> 8, COLUMN_START & 0xff,
 
         /* Image height - 1. Reg0x03 */
         (IMAGE_HEIGHT - 1) >> 8, (IMAGE_HEIGHT - 1) & 0xff,
@@ -200,7 +233,7 @@ void SSAG::InitSequence()
         (IMAGE_WIDTH - 1) >> 8, (IMAGE_WIDTH - 1) & 0xff,
 
         /* Shutter Width. Reg0x09 */
-        (SHUTTER_WIDTH) >> 8, (SHUTTER_WIDTH) & 0xff
+        SHUTTER_WIDTH >> 8, SHUTTER_WIDTH & 0xff
     };
 
     int wValue = BUFFER_SIZE & 0xffff;
@@ -224,7 +257,7 @@ unsigned char *SSAG::ReadBuffer(int timeout)
     iptr = image;
     for (int i = 0; i < IMAGE_HEIGHT; i++) {
         memcpy(iptr, dptr, IMAGE_WIDTH);
-        dptr += BUFFER_ROW_LENGTH; /* Bytes between IMAGE_WIDTH and BUFFER_ROW_LENGTH can be ignored */
+        dptr += BUFFER_WIDTH; /* Horizontal Blanking can be ignored */
         iptr += IMAGE_WIDTH;
     }
 
