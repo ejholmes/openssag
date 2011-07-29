@@ -50,13 +50,13 @@
  * |  |  |                                  |  |  |     |               |               |
  * |  |  |                                  |  |  |     |               |               |
  * |  |  |                                  |  |  |     |               |               |
- * | 7| 4|                                  |4 |16|     | 1048 Pixels   | 1033 Pixels   | 1024 Pixels
+ * | 7| 5|                                  |4 |16|     | 1048 Pixels   | 1033 Pixels   | 1024 Pixels
  * |  |  |                                  |  |  |     |               |               |
  * |  |  |                                  |  |  |     |               |               |
  * |  |  |                                  |  |  |     |               |               |
  * |  |  |                                  |  |  |     |               |               |
  * |  |  +----------------------------------+  |  |     |               |               -
- * |  |                   4                    |  |     |               |
+ * |  |                   5                    |  |     |               |
  * |  +----------------------------------------+  |     |               -
  * |                      7                       |     |
  * +----------------------------------------------+     -
@@ -83,7 +83,7 @@ enum USB_REQUEST {
 /* USB Bulk endpoint to grab data from */
 #define BUFFER_ENDPOINT     0x82
 
-/* Image size */
+/* Image size. Values must be even numbers. */
 #define IMAGE_WIDTH         1280
 #define IMAGE_HEIGHT        1024
 
@@ -97,11 +97,17 @@ enum USB_REQUEST {
 #define BUFFER_HEIGHT       (IMAGE_HEIGHT + VERTICAL_BLANKING + 1)
 #define BUFFER_SIZE         (BUFFER_WIDTH * BUFFER_HEIGHT)
 
-/* Number of pixel columns/rows to skip */
+/* Number of pixel columns/rows to skip. Values must be even numbers. */
 #define ROW_START           12
 #define COLUMN_START        20
 
+/* Shutter width */
 #define SHUTTER_WIDTH       (IMAGE_HEIGHT + VERTICAL_BLANKING)
+
+/* Pixel offset appears to be calculated based on the dimensions of the chip.
+ * 31 = 16 + 4 + 4 + 7 and there are 8 rows of optically black pixels. At the
+ * moment, I'm not exactly sure why this would be required. It also appears to
+ * change randomly at times. */
 #define PIXEL_OFFSET        (8 * (BUFFER_WIDTH + 31))
 
 /* Number of seconds to wait for camera to renumerate after loading firmware */
@@ -221,8 +227,15 @@ struct raw_image *SSAG::Expose(int duration)
     image->height = IMAGE_HEIGHT;
     image->data = this->ReadBuffer(duration + USB_TIMEOUT);
 
-    if (!image->data)
+    DBG("Pixel Offset: %d\n", PIXEL_OFFSET);
+    DBG("Buffer Size: %d\n", BUFFER_SIZE);
+    DBG("  Buffer Width: %d\n", BUFFER_WIDTH);
+    DBG("  Buffer Height: %d\n", BUFFER_HEIGHT);
+
+    if (!image->data) {
+        free(image);
         return NULL;
+    }
 
     return image;
 }
@@ -283,12 +296,18 @@ void SSAG::InitSequence()
 
 unsigned char *SSAG::ReadBuffer(int timeout)
 {
-    DBG("Pixel Offset: %d, Buffer Width: %d, Buffer Height: %d, Buffer Size: %d\n", PIXEL_OFFSET, BUFFER_WIDTH, BUFFER_HEIGHT, BUFFER_SIZE);
-
     char *data = (char *)malloc(BUFFER_SIZE);
     char *dptr, *iptr;
     
-    usb_bulk_read(this->handle, BUFFER_ENDPOINT, data, BUFFER_SIZE, timeout);
+    int ret = usb_bulk_read(this->handle, BUFFER_ENDPOINT, data, BUFFER_SIZE, timeout);
+
+    if (ret != BUFFER_SIZE) {
+        DBG("Expected %d bytes of image data but got %d bytes\n", BUFFER_SIZE, ret);
+        free(data);
+        return NULL;
+    } else {
+        DBG("Received %d bytes of image data\n", ret);
+    }
 
     char *image = (char *)malloc(IMAGE_WIDTH * IMAGE_HEIGHT);
 
