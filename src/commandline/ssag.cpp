@@ -1,5 +1,26 @@
+/*
+ * File: ssag.cpp
+ *
+ * Copyright (c) 2011 Eric J. Holmes
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#   include "config.h"
 #endif
 
 #include <stdio.h>
@@ -9,15 +30,15 @@
 #include <getopt.h>
 
 #if HAVE_LIBMAGICKCORE
-#include <magick/MagickCore.h>
+#   include <magick/MagickCore.h>
 #endif
 
 #include "openssag.h"
 
 #if DEBUG
-#define DBG(...) fprintf(stderr, __VA_ARGS__)
+#   define DBG(...) fprintf(stderr, __VA_ARGS__)
 #else
-#define DBG(...)
+#   define DBG(...)
 #endif
 
 using namespace OpenSSAG;
