@@ -188,6 +188,8 @@ bool SSAG::Connect(bool bootload)
     }
 
     this->SetBufferMode();
+    this->SetGain(1);
+    this->InitSequence();
 
     return true;
 }
@@ -330,7 +332,13 @@ void SSAG::SetGain(int gain)
 {
     /* See the MT9M001 datasheet for more information on the following code. */
     if (gain < 1 || gain > 15) {
+        DBG("Gain was out of valid range: %d (Should be 1-15)\n", gain);
         return;
+    }
+
+    /* Default PHD Setting */
+    if (gain == 7) {
+        this->gain = 0x3b;
     } else if (gain <= 4) {
         this->gain = gain * 8;
     } else if (gain <= 8) {
@@ -338,6 +346,8 @@ void SSAG::SetGain(int gain)
     } else if (gain <= 15) {
         this->gain = (gain - 8) + 0x60;
     }
+
+    DBG("Setting gain to %d (Register value 0x%02x)\n", gain, this->gain);
 }
 
 void SSAG::FreeRawImage(raw_image *image)

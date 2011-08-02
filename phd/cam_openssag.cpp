@@ -107,7 +107,7 @@ bool Camera_OpenSSAGClass::CaptureFull(int duration, usImage& img, bool recon) {
         return true;
     }
 
-    ssag->SetGain((int)(GuideCameraGain / 24));
+    ssag->SetGain((int)(GuideCameraGain / 13));
     struct raw_image *raw = ssag->Expose(duration);
 
     for (unsigned int i = 0; i < raw->width * raw->height; i++) {
