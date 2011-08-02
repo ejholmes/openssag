@@ -118,8 +118,6 @@ using namespace OpenSSAG;
 SSAG::SSAG()
 {
     usb_init();
-    /* 0x3b is used by the windows driver in PHD */
-    this->gain = 0x3b;
 }
 
 struct device_info *SSAG::EnumerateDevices()
