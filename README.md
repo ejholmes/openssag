@@ -1,18 +1,18 @@
 OpenSSAG
 ============
-This is an open source C++ library for controlling the [Orion StarShoot Autoguider](http://www.telescope.com/Astrophotography/Astrophotography-Cameras/Orion-StarShoot-AutoGuider/pc/-1/c/4/sc/58/p/52064.uts) for use on Linux and Mac OS X.
+This is a C++ library for controlling the [Orion StarShoot Autoguider](http://www.telescope.com/Astrophotography/Astrophotography-Cameras/Orion-StarShoot-AutoGuider/pc/-1/c/4/sc/58/p/52064.uts) for use on Linux and Mac OS X.
 
 The Orion StarShoot Autoguider is a popular choice for many amature astrophotographers but unfortunately does not include support for Mac OS X and Linux operating systems. The goal of this project is to do just that. The library currently supports setting gain/exposure, capturing, and sending guide commands through the on-board ST4 port. Currently, the only supported resolution to capture at is SXGA (1280x1024).
 
 Compiling From Source
 ---------------------
-Download the most recent source package from the [downloads section](https://github.com/CortexAstronomy/OpenSSAG/downloads) and extract the contents.
 
 Prerequisites: [libusb-0.1](http://www.libusb.org)
 
 **Linux**
 
 ```
+$ ./autogen.sh
 $ ./configure
 $ make
 $ make install
@@ -22,6 +22,7 @@ $ make install
 Requires Developer Tools/Xcode. You may need to specifiy the location of libusb, like so:
 
 ```
+$ ./autogen.sh
 $ ./configure LIBUSB_CFLAGS="<libusb cflags>" LIBUSB_LIBS="<libusb libs>"
 $ make
 $ make install
@@ -31,6 +32,7 @@ Or, just install [MacPorts](http://www.macports.org/) and run:
 
 ```
 $ port install pkgconfig libusb-legacy
+$ ./autogen.sh
 $ ./configure
 $ make
 $ make install
