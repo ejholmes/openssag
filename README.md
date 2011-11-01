@@ -11,66 +11,56 @@ Prerequisites: [libusb-0.1](http://www.libusb.org)
 
 **Linux**
 
-```
-$ ./autogen.sh
-$ ./configure
-$ make
-$ make install
-```
+    $ ./autogen.sh
+    $ ./configure
+    $ make
+    $ make install
 
 **Mac OS X**  
 Requires Developer Tools/Xcode. You may need to specifiy the location of libusb, like so:
 
-```
-$ ./autogen.sh
-$ ./configure LIBUSB_CFLAGS="<libusb cflags>" LIBUSB_LIBS="<libusb libs>"
-$ make
-$ make install
-```
+    $ ./autogen.sh
+    $ ./configure LIBUSB_CFLAGS="<libusb cflags>" LIBUSB_LIBS="<libusb libs>"
+    $ make
+    $ make install
 
 Or, just install [MacPorts](http://www.macports.org/) and run:
 
-```
-$ port install pkgconfig libusb-legacy
-$ ./autogen.sh
-$ ./configure
-$ make
-$ make install
-```
+    $ port install pkgconfig libusb-legacy
+    $ ./autogen.sh
+    $ ./configure
+    $ make
+    $ make install
 
 Usage
 -----
 The following shows a simple example of how to use the library in a C++ application.  
 
-```
-#include <stdio.h>
+    #include <stdio.h>
 
-#include "openssag.h"
+    #include "openssag.h"
 
-int main()
-{
-    OpenSSAG::SSAG *camera = new OpenSSAG::SSAG();
-    
-    if (camera->Connect()) {
-        struct raw_image *image = camera->Expose(1000);
-        FILE *fp = fopen("image", "w");
-        fwrite(image->data, 1, image->width * image->height, fp);
-        fclose(fp);
-        camera->Disconnect();
+    int main()
+    {
+        OpenSSAG::SSAG *camera = new OpenSSAG::SSAG();
+        
+        if (camera->Connect()) {
+            struct raw_image *image = camera->Expose(1000);
+            FILE *fp = fopen("image", "w");
+            fwrite(image->data, 1, image->width * image->height, fp);
+            fclose(fp);
+            camera->Disconnect();
+        }
+        else {
+            printf("Could not find StarShoot Autoguider\n");
+        }
     }
-    else {
-        printf("Could not find StarShoot Autoguider\n");
-    }
-}
-```
 
 Compile on Linux/Mac OS X
 
-```
-$ g++ main.cpp -lusb -lopenssag
-$ ./a.out
-$ convert -size 1280x1024 -depth 8 gray:image image.jpg
-```
+    $ g++ main.cpp -lusb -lopenssag
+    $ ./a.out
+    $ convert -size 1280x1024 -depth 8 gray:image image.jpg
 
 Technical Information
 ---------------------
