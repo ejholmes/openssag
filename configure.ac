@@ -10,6 +10,8 @@ AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 AC_PREFIX_DEFAULT([/usr])
 LT_INIT
 
+AM_PROG_AR
+
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC

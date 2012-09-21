@@ -26,10 +26,10 @@ $ make
 $ make install
 ```
 
-Or, just install [MacPorts](http://www.macports.org/) and run:
+Or, just install [Homebrew](http://mxcl.github.com/homebrew/) and run:
 
 ```bash
-$ port install pkgconfig libusb-legacy
+$ brew install autoconf automake libtool libusb-compat
 $ ./autogen.sh
 $ ./configure
 $ make
